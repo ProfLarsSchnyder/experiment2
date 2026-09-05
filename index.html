@@ -24,11 +24,12 @@
       --red-bg: #fae8e5;
       --yellow-bg: #fff4dd;
       --yellow-border: #f0c36d;
+      --purple-bg: #f4ecff;
+      --purple-border: #d6bdf5;
+      --purple: #6d3fa0;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -69,17 +70,11 @@
       color: var(--accent);
     }
 
-    h3 {
-      margin-bottom: 8px;
-    }
+    h3 { margin-bottom: 8px; }
 
-    p, li {
-      line-height: 1.45;
-    }
+    p, li { line-height: 1.45; }
 
-    .muted {
-      color: var(--muted);
-    }
+    .muted { color: var(--muted); }
 
     .warning {
       background: var(--yellow-bg);
@@ -103,17 +98,12 @@
       margin-right: 8px;
     }
 
-    button:hover {
-      opacity: 0.9;
-    }
+    button:hover { opacity: 0.9; }
 
-    button.danger {
-      background: var(--red);
-    }
-
-    button.secondary {
-      background: #555;
-    }
+    button.danger { background: var(--red); }
+    button.secondary { background: #555; }
+    button.blue { background: var(--blue); }
+    button.green { background: var(--green); }
 
     button:disabled {
       opacity: 0.45;
@@ -130,9 +120,7 @@
       margin-top: 8px;
     }
 
-    .hidden {
-      display: none;
-    }
+    .hidden { display: none; }
 
     .step {
       font-size: 0.9rem;
@@ -252,6 +240,17 @@
       color: var(--red);
     }
 
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .choice-row button {
+      min-width: 140px;
+    }
+
     .teacher-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
@@ -282,8 +281,8 @@
     }
 
     .metric.percent {
-      background: #f4ecff;
-      border-color: #d6bdf5;
+      background: var(--purple-bg);
+      border-color: var(--purple-border);
     }
 
     .metric h3 {
@@ -331,13 +330,8 @@
       border: 1px solid var(--border);
     }
 
-    .result-box.low {
-      background: var(--blue-bg);
-    }
-
-    .result-box.high {
-      background: var(--green-bg);
-    }
+    .result-box.low { background: var(--blue-bg); }
+    .result-box.high { background: var(--green-bg); }
 
     .result-label {
       font-size: 0.8rem;
@@ -380,8 +374,8 @@
       padding: 8px 12px;
       border-radius: 999px;
       font-weight: bold;
-      background: #f4ecff;
-      color: #6d3fa0;
+      background: var(--purple-bg);
+      color: var(--purple);
     }
 
     .bar-wrap {
@@ -399,13 +393,8 @@
       border-radius: 999px;
     }
 
-    .bar.lowbar {
-      background: var(--blue);
-    }
-
-    .bar.highbar {
-      background: var(--green);
-    }
+    .bar.lowbar { background: var(--blue); }
+    .bar.highbar { background: var(--green); }
 
     .group-list {
       display: grid;
@@ -422,13 +411,8 @@
       background: white;
     }
 
-    .person-chip.low {
-      background: var(--blue-bg);
-    }
-
-    .person-chip.high {
-      background: var(--green-bg);
-    }
+    .person-chip.low { background: var(--blue-bg); }
+    .person-chip.high { background: var(--green-bg); }
 
     .positive {
       color: var(--green);
@@ -451,21 +435,13 @@
     }
 
     @media (max-width: 760px) {
-      main {
-        padding: 14px;
-      }
+      main { padding: 14px; }
 
-      .product-single img {
-        max-height: 340px;
-      }
+      .product-single img { max-height: 340px; }
 
-      .price {
-        font-size: 2rem;
-      }
+      .price { font-size: 2rem; }
 
-      .reaction-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
+      .reaction-grid { grid-template-columns: repeat(4, 1fr); }
 
       .reaction-tile {
         min-height: 56px;
@@ -473,13 +449,9 @@
         font-size: 0.9rem;
       }
 
-      .result-row {
-        grid-template-columns: 1fr;
-      }
+      .result-row { grid-template-columns: 1fr; }
 
-      .metric .big {
-        font-size: 1.55rem;
-      }
+      .metric .big { font-size: 1.55rem; }
     }
   </style>
 </head>
@@ -538,10 +510,10 @@
     </section>
 
     <section id="reactionView" class="card hidden">
-      <span class="step">Zwischenaufgabe</span>
-      <h2>Kurze Konzentrationsaufgabe</h2>
+      <span id="reactionStep" class="step">Zwischenaufgabe</span>
+      <h2 id="reactionTitle">Kurze Konzentrationsaufgabe</h2>
 
-      <p>Klicken Sie so schnell wie möglich auf alle Felder mit dem Wort <strong>Marke</strong>.</p>
+      <p id="reactionInstruction"></p>
       <p class="muted">Die Felder werden erst nach dem Start aufgedeckt. Arbeiten Sie weiterhin alleine und ohne zu sprechen.</p>
 
       <div class="reaction-top">
@@ -553,7 +525,7 @@
 
       <p id="reactionFeedback" class="muted"></p>
 
-      <button id="reactionContinueButton" class="hidden" onclick="showWillingnessIntro()">Weiter</button>
+      <button id="reactionContinueButton" class="hidden" onclick="continueAfterReaction()">Weiter</button>
     </section>
 
     <section id="willingnessIntroView" class="card hidden">
@@ -584,12 +556,47 @@
           <br>
           <input id="priceInput" type="number" min="0" step="0.05" placeholder="CHF" />
 
-          <p class="muted">
-            Geben Sie den Betrag ein, der für Sie persönlich passend wirkt.
-          </p>
+          <p class="muted">Geben Sie den Betrag ein, der für Sie persönlich passend wirkt.</p>
 
           <button onclick="saveWillingness()">Einschätzung speichern</button>
         </div>
+      </div>
+    </section>
+
+    <section id="extraIntroView" class="card hidden">
+      <span class="step">Teil 3</span>
+      <h2>Kurze Zusatzrunde</h2>
+
+      <p>Zum Schluss folgen noch einige kurze Einschätzungsfragen.</p>
+      <p>Antworten Sie weiterhin spontan und ohne Austausch mit anderen.</p>
+
+      <button onclick="showExtraCompare()">Starten</button>
+    </section>
+
+    <section id="extraCompareView" class="card hidden">
+      <span class="step">Teil 3</span>
+      <div class="progress" id="extraCompareProgress"></div>
+      <h2 id="extraCompareTitle"></h2>
+      <p id="extraCompareQuestion"></p>
+
+      <div class="choice-row">
+        <button class="green" onclick="saveExtraComparison('mehr')">Mehr</button>
+        <button class="blue" onclick="saveExtraComparison('weniger')">Weniger</button>
+      </div>
+    </section>
+
+    <section id="extraEstimateView" class="card hidden">
+      <span class="step">Teil 3</span>
+      <div class="progress" id="extraEstimateProgress"></div>
+      <h2 id="extraEstimateTitle"></h2>
+      <p id="extraEstimateQuestion"></p>
+
+      <div class="answer-panel">
+        <label for="extraInput"><strong id="extraInputLabel"></strong></label>
+        <br>
+        <input id="extraInput" type="number" min="0" step="1" placeholder="" />
+        <p class="muted">Geben Sie eine möglichst passende Schätzung ein.</p>
+        <button onclick="saveExtraEstimate()">Einschätzung speichern</button>
       </div>
     </section>
 
@@ -609,9 +616,9 @@
     </section>
 
     <section id="teacherView" class="card hidden">
-      <h2>Lehrermodus, Zahlungsbereitschaft</h2>
+      <h2>Lehrermodus, Auswertung</h2>
       <p class="muted">
-        Vergleich zwischen Gruppe mit tiefen Vergleichspreisen und Gruppe mit hohen Vergleichspreisen.
+        Produktteil und Zusatzfragen werden separat ausgewertet. Der prozentuale Gesamteffekt ist jeweils der Durchschnitt der einzelnen prozentualen Effekte.
       </p>
 
       <button onclick="loadResults()">Resultate aktualisieren</button>
@@ -642,8 +649,8 @@
         info: "500 ml",
         anchorImage: "1a.png",
         targetImage: "1n.png",
-        lowPrice: 1.40,
-        highPrice: 2.80
+        lowPrice: 1.20,
+        highPrice: 2.90
       },
       {
         id: 2,
@@ -662,8 +669,8 @@
         info: "250 ml",
         anchorImage: "3a.png",
         targetImage: "3n.png",
-        lowPrice: 2.50,
-        highPrice: 4.90
+        lowPrice: 2.20,
+        highPrice: 5.20
       },
       {
         id: 4,
@@ -672,8 +679,8 @@
         info: "60 Minuten, 1 Person",
         anchorImage: "4a.png",
         targetImage: "4n.png",
-        lowPrice: 29,
-        highPrice: 49
+        lowPrice: 25,
+        highPrice: 55
       },
       {
         id: 5,
@@ -682,16 +689,65 @@
         info: "1 Monat, Standardzugang",
         anchorImage: "5a.png",
         targetImage: "5n.png",
-        lowPrice: 49,
-        highPrice: 89
+        lowPrice: 35,
+        highPrice: 79
       }
     ];
 
-    const reactionWordsOriginal = [
+    const extraQuestions = [
+      {
+        id: 1,
+        name: "Basel - Sydney",
+        unit: "km",
+        lowAnchor: 10000,
+        highAnchor: 25000,
+        correctValue: 16600,
+        compareTitle: "Distanz",
+        estimateTitle: "Distanz",
+        compareText: "Ist die Distanz von Basel nach Sydney mehr oder weniger als",
+        estimateText: "Wie viele Kilometer beträgt die Distanz von Basel nach Sydney ungefähr?",
+        placeholder: "km"
+      },
+      {
+        id: 2,
+        name: "Grossraum Tokio",
+        unit: "Mio. Einwohner/innen",
+        lowAnchor: 20,
+        highAnchor: 60,
+        correctValue: 37,
+        compareTitle: "Einwohnerzahl",
+        estimateTitle: "Einwohnerzahl",
+        compareText: "Hat der Grossraum Tokio mehr oder weniger als",
+        estimateText: "Wie viele Millionen Einwohnerinnen und Einwohner hat der Grossraum Tokio ungefähr?",
+        placeholder: "Millionen"
+      },
+      {
+        id: 3,
+        name: "Fläche Genfersee",
+        unit: "km²",
+        lowAnchor: 200,
+        highAnchor: 1200,
+        correctValue: 580,
+        compareTitle: "Fläche",
+        estimateTitle: "Fläche",
+        compareText: "Ist die Fläche des Genfersees mehr oder weniger als",
+        estimateText: "Wie gross ist die Fläche des Genfersees ungefähr?",
+        placeholder: "km²"
+      }
+    ];
+
+    const reactionOneWords = [
       "Produkt", "Marke", "Design", "Zielgruppe", "Farbe", "Werbung",
       "Verpackung", "Kunde", "Angebot", "Qualität", "Logo", "Marke",
       "Verkauf", "Marke", "Nutzen", "Material", "Form", "Marke",
       "Geschmack", "Service", "Trend", "Name", "Bild", "Aktion"
+    ];
+
+    const reactionTwoWords = [
+      "Kunde", "Preis", "Logo", "Werbung", "Nutzen", "Preis",
+      "Design", "Zielgruppe", "Produkt", "Farbe", "Preis", "Service",
+      "Angebot", "Verpackung", "Preis", "Marke", "Name", "Aktion",
+      "Qualität", "Bild", "Trend", "Material", "Form", "Verkauf"
     ];
 
     let participant = null;
@@ -699,11 +755,16 @@
     let willingnessIndex = 0;
     let willingnessOrder = [];
     let reactionWords = [];
-    let foundMarkeCount = 0;
-    let totalMarkeCount = 0;
+    let reactionTargetWord = "Marke";
+    let nextAfterReaction = "willingness";
+    let foundTargetCount = 0;
+    let totalTargetCount = 0;
     let reactionStartedAt = null;
     let reactionTimerInterval = null;
     let reactionActive = false;
+    let extraIndex = 0;
+    let extraComparisonAnswer = null;
+    let extraOrder = [];
 
     function hideAllViews() {
       [
@@ -713,6 +774,9 @@
         "reactionView",
         "willingnessIntroView",
         "willingnessItemView",
+        "extraIntroView",
+        "extraCompareView",
+        "extraEstimateView",
         "doneView",
         "teacherLoginView",
         "teacherView"
@@ -723,35 +787,29 @@
       return "CHF " + Number(value).toFixed(2);
     }
 
+    function formatNumber(value, decimals = 1) {
+      if (value === null || isNaN(value)) return "-";
+      return Number(value).toFixed(decimals);
+    }
+
     function formatDiff(value) {
-      if (value === null || isNaN(value)) {
-        return "-";
-      }
-
-      if (value > 0) {
-        return "+ CHF " + Number(value).toFixed(2);
-      }
-
-      if (value < 0) {
-        return "- CHF " + Math.abs(Number(value)).toFixed(2);
-      }
-
+      if (value === null || isNaN(value)) return "-";
+      if (value > 0) return "+ CHF " + Number(value).toFixed(2);
+      if (value < 0) return "- CHF " + Math.abs(Number(value)).toFixed(2);
       return "CHF 0.00";
     }
 
+    function formatGenericDiff(value, unit) {
+      if (value === null || isNaN(value)) return "-";
+      if (value > 0) return "+ " + Number(value).toFixed(1) + " " + unit;
+      if (value < 0) return "- " + Math.abs(Number(value)).toFixed(1) + " " + unit;
+      return "0.0 " + unit;
+    }
+
     function formatPercent(value) {
-      if (value === null || isNaN(value)) {
-        return "-";
-      }
-
-      if (value > 0) {
-        return "+ " + Number(value).toFixed(1) + " %";
-      }
-
-      if (value < 0) {
-        return "- " + Math.abs(Number(value)).toFixed(1) + " %";
-      }
-
+      if (value === null || isNaN(value)) return "-";
+      if (value > 0) return "+ " + Number(value).toFixed(1) + " %";
+      if (value < 0) return "- " + Math.abs(Number(value)).toFixed(1) + " %";
       return "0.0 %";
     }
 
@@ -764,19 +822,15 @@
     }
 
     function diffClass(value) {
-      if (value === null || isNaN(value)) {
-        return "neutral";
-      }
-
-      if (value > 0) {
-        return "positive";
-      }
-
-      if (value < 0) {
-        return "negative";
-      }
-
+      if (value === null || isNaN(value)) return "neutral";
+      if (value > 0) return "positive";
+      if (value < 0) return "negative";
       return "neutral";
+    }
+
+    function average(values) {
+      if (!values.length) return null;
+      return values.reduce((sum, value) => sum + Number(value), 0) / values.length;
     }
 
     function shuffleArray(array) {
@@ -796,13 +850,20 @@
       return participant.anchor_group === "low" ? product.lowPrice : product.highPrice;
     }
 
+    function getExtraAnchor(question) {
+      return participant.anchor_group === "low" ? question.lowAnchor : question.highAnchor;
+    }
+
     function resetSessionForNewRun() {
       sessionStorage.removeItem("anchor_experiment_participant");
       sessionStorage.removeItem("anchor_experiment_willingness_order");
+      sessionStorage.removeItem("anchor_experiment_extra_order");
       participant = null;
       anchorIndex = 0;
       willingnessIndex = 0;
       willingnessOrder = [];
+      extraIndex = 0;
+      extraOrder = [];
     }
 
     async function startExperiment() {
@@ -839,8 +900,24 @@
         );
       }
 
+      const existingExtraOrder = sessionStorage.getItem("anchor_experiment_extra_order");
+
+      if (existingExtraOrder) {
+        const ids = JSON.parse(existingExtraOrder);
+        extraOrder = ids
+          .map(id => extraQuestions.find(question => question.id === id))
+          .filter(Boolean);
+      } else {
+        extraOrder = shuffleArray(extraQuestions);
+        sessionStorage.setItem(
+          "anchor_experiment_extra_order",
+          JSON.stringify(extraOrder.map(question => question.id))
+        );
+      }
+
       anchorIndex = 0;
       willingnessIndex = 0;
+      extraIndex = 0;
 
       hideAllViews();
       document.getElementById("anchorIntroView").classList.remove("hidden");
@@ -870,21 +947,38 @@
       anchorIndex++;
 
       if (anchorIndex >= products.length) {
-        showReactionGame();
+        showReactionGame(1);
       } else {
         renderAnchorItem();
       }
     }
 
-    function showReactionGame() {
+    function showReactionGame(number) {
       stopReactionTimer();
 
       hideAllViews();
       document.getElementById("reactionView").classList.remove("hidden");
 
-      reactionWords = shuffleArray(reactionWordsOriginal);
-      foundMarkeCount = 0;
-      totalMarkeCount = reactionWords.filter(word => word === "Marke").length;
+      if (number === 1) {
+        reactionWords = shuffleArray(reactionOneWords);
+        reactionTargetWord = "Marke";
+        nextAfterReaction = "willingness";
+        document.getElementById("reactionStep").textContent = "Zwischenaufgabe";
+        document.getElementById("reactionTitle").textContent = "Kurze Konzentrationsaufgabe";
+        document.getElementById("reactionInstruction").innerHTML =
+          'Klicken Sie so schnell wie möglich auf alle Felder mit dem Wort <strong>Marke</strong>.';
+      } else {
+        reactionWords = shuffleArray(reactionTwoWords);
+        reactionTargetWord = "Preis";
+        nextAfterReaction = "extra";
+        document.getElementById("reactionStep").textContent = "Zwischenaufgabe";
+        document.getElementById("reactionTitle").textContent = "Kurze Konzentrationsaufgabe";
+        document.getElementById("reactionInstruction").innerHTML =
+          'Klicken Sie so schnell wie möglich auf alle Felder mit dem Wort <strong>Preis</strong>.';
+      }
+
+      foundTargetCount = 0;
+      totalTargetCount = reactionWords.filter(word => word === reactionTargetWord).length;
       reactionStartedAt = null;
       reactionActive = false;
 
@@ -909,19 +1003,14 @@
         button.disabled = true;
 
         button.addEventListener("click", () => {
-          if (!reactionActive) {
-            return;
-          }
+          if (!reactionActive) return;
+          if (button.classList.contains("correct") || button.classList.contains("wrong")) return;
 
-          if (button.classList.contains("correct") || button.classList.contains("wrong")) {
-            return;
-          }
-
-          if (word === "Marke") {
+          if (word === reactionTargetWord) {
             button.classList.add("correct");
-            foundMarkeCount++;
+            foundTargetCount++;
 
-            if (foundMarkeCount === totalMarkeCount) {
+            if (foundTargetCount === totalTargetCount) {
               finishReactionGame();
             }
           } else {
@@ -942,7 +1031,7 @@
       const startButton = document.getElementById("reactionStartButton");
       const feedback = document.getElementById("reactionFeedback");
 
-      foundMarkeCount = 0;
+      foundTargetCount = 0;
       reactionStartedAt = Date.now();
       reactionActive = true;
 
@@ -985,6 +1074,14 @@
       document.getElementById("reactionTimer").textContent = "Zeit: " + seconds + " s";
       feedback.textContent = "Geschafft in " + seconds + " Sekunden.";
       continueButton.classList.remove("hidden");
+    }
+
+    function continueAfterReaction() {
+      if (nextAfterReaction === "willingness") {
+        showWillingnessIntro();
+      } else {
+        showExtraIntro();
+      }
     }
 
     function showWillingnessIntro() {
@@ -1050,10 +1147,109 @@
       willingnessIndex++;
 
       if (willingnessIndex >= willingnessOrder.length) {
+        showReactionGame(2);
+      } else {
+        renderWillingnessItem();
+      }
+    }
+
+    function showExtraIntro() {
+      hideAllViews();
+      document.getElementById("extraIntroView").classList.remove("hidden");
+    }
+
+    function showExtraCompare() {
+      extraComparisonAnswer = null;
+      hideAllViews();
+      document.getElementById("extraCompareView").classList.remove("hidden");
+      renderExtraCompare();
+    }
+
+    function renderExtraCompare() {
+      const question = extraOrder[extraIndex];
+      const anchor = getExtraAnchor(question);
+
+      document.getElementById("extraCompareProgress").textContent =
+        "Zusatzfrage " + (extraIndex + 1) + " von " + extraOrder.length;
+
+      document.getElementById("extraCompareTitle").textContent = question.compareTitle;
+      document.getElementById("extraCompareQuestion").innerHTML =
+        question.compareText + " <strong>" + formatExtraAnchor(anchor, question.unit) + "</strong>?";
+    }
+
+    function formatExtraAnchor(value, unit) {
+      if (unit === "Mio. Einwohner/innen") {
+        return Number(value).toFixed(0) + " Millionen Einwohnerinnen und Einwohner";
+      }
+
+      return Number(value).toLocaleString("de-CH") + " " + unit;
+    }
+
+    function saveExtraComparison(answer) {
+      extraComparisonAnswer = answer;
+      hideAllViews();
+      document.getElementById("extraEstimateView").classList.remove("hidden");
+      renderExtraEstimate();
+    }
+
+    function renderExtraEstimate() {
+      const question = extraOrder[extraIndex];
+
+      document.getElementById("extraEstimateProgress").textContent =
+        "Zusatzfrage " + (extraIndex + 1) + " von " + extraOrder.length;
+
+      document.getElementById("extraEstimateTitle").textContent = question.estimateTitle;
+      document.getElementById("extraEstimateQuestion").textContent = question.estimateText;
+      document.getElementById("extraInputLabel").textContent = "Ihre Schätzung:";
+      document.getElementById("extraInput").placeholder = question.placeholder;
+      document.getElementById("extraInput").value = "";
+
+      setTimeout(() => {
+        document.getElementById("extraInput").focus();
+      }, 100);
+    }
+
+    async function saveExtraEstimate() {
+      const input = document.getElementById("extraInput");
+      const value = Number(input.value);
+
+      if (!input.value || value < 0) {
+        alert("Bitte eine gültige Schätzung eingeben.");
+        return;
+      }
+
+      const question = extraOrder[extraIndex];
+      const anchor = getExtraAnchor(question);
+
+      const row = {
+        session_id: SESSION_ID,
+        participant_id: participant.participant_id,
+        participant_number: participant.participant_number,
+        anchor_group: participant.anchor_group,
+        question_id: question.id,
+        question_name: question.name,
+        anchor_value: anchor,
+        comparison_answer: extraComparisonAnswer,
+        estimated_value: value,
+        correct_value: question.correctValue
+      };
+
+      const { error } = await client
+        .from("anchor_experiment_extra_answers")
+        .upsert(row, { onConflict: "participant_id,question_id" });
+
+      if (error) {
+        alert("Fehler beim Speichern der Zusatzfrage: " + error.message);
+        return;
+      }
+
+      extraIndex++;
+
+      if (extraIndex >= extraOrder.length) {
         hideAllViews();
         document.getElementById("doneView").classList.remove("hidden");
       } else {
-        renderWillingnessItem();
+        showExtraCompare();
       }
     }
 
@@ -1081,14 +1277,6 @@
       document.getElementById("startView").classList.remove("hidden");
     }
 
-    function average(values) {
-      if (!values.length) {
-        return null;
-      }
-
-      return values.reduce((sum, value) => sum + Number(value), 0) / values.length;
-    }
-
     async function loadResults() {
       const answersQuery = client
         .from("anchor_experiment_answers")
@@ -1096,19 +1284,31 @@
         .eq("session_id", SESSION_ID)
         .order("product_id", { ascending: true });
 
+      const extraAnswersQuery = client
+        .from("anchor_experiment_extra_answers")
+        .select("*")
+        .eq("session_id", SESSION_ID)
+        .order("question_id", { ascending: true });
+
       const participantsQuery = client
         .from("anchor_experiment_participants")
         .select("*")
         .eq("session_id", SESSION_ID)
         .order("participant_number", { ascending: true });
 
-      const [answersResult, participantsResult] = await Promise.all([
+      const [answersResult, extraAnswersResult, participantsResult] = await Promise.all([
         answersQuery,
+        extraAnswersQuery,
         participantsQuery
       ]);
 
       if (answersResult.error) {
-        alert("Fehler beim Laden der Antworten: " + answersResult.error.message);
+        alert("Fehler beim Laden der Produktantworten: " + answersResult.error.message);
+        return;
+      }
+
+      if (extraAnswersResult.error) {
+        alert("Fehler beim Laden der Zusatzantworten: " + extraAnswersResult.error.message);
         return;
       }
 
@@ -1117,20 +1317,71 @@
         return;
       }
 
-      renderResults(answersResult.data || [], participantsResult.data || []);
+      renderResults(
+        answersResult.data || [],
+        extraAnswersResult.data || [],
+        participantsResult.data || []
+      );
     }
 
-    function renderResults(rows, participants) {
-      const tableDiv = document.getElementById("resultsTable");
+    function productStats(rows) {
+      return products.map(product => {
+        const productRows = rows.filter(r => r.product_id === product.id);
+        const lows = productRows.filter(r => r.anchor_group === "low");
+        const highs = productRows.filter(r => r.anchor_group === "high");
+
+        const lowAvg = average(lows.map(r => r.estimated_price));
+        const highAvg = average(highs.map(r => r.estimated_price));
+        const diff = lowAvg !== null && highAvg !== null ? highAvg - lowAvg : null;
+        const percent = percentDiffValue(highAvg, lowAvg);
+
+        return { product, lows, highs, lowAvg, highAvg, diff, percent };
+      });
+    }
+
+    function extraStats(rows) {
+      return extraQuestions.map(question => {
+        const questionRows = rows.filter(r => r.question_id === question.id);
+        const lows = questionRows.filter(r => r.anchor_group === "low");
+        const highs = questionRows.filter(r => r.anchor_group === "high");
+
+        const lowAvg = average(lows.map(r => r.estimated_value));
+        const highAvg = average(highs.map(r => r.estimated_value));
+        const diff = lowAvg !== null && highAvg !== null ? highAvg - lowAvg : null;
+        const percent = percentDiffValue(highAvg, lowAvg);
+
+        return { question, lows, highs, lowAvg, highAvg, diff, percent };
+      });
+    }
+
+    function averagePercentFromItems(statsItems) {
+      const values = statsItems
+        .map(item => item.percent)
+        .filter(value => value !== null && !isNaN(value));
+
+      return average(values);
+    }
+
+    function averageAbsoluteFromItems(statsItems) {
+      const values = statsItems
+        .map(item => item.diff)
+        .filter(value => value !== null && !isNaN(value));
+
+      return average(values);
+    }
+
+    function renderResults(productRows, extraRows, participants) {
       const summaryDiv = document.getElementById("resultsSummary");
+      const tableDiv = document.getElementById("resultsTable");
 
-      const lowRows = rows.filter(r => r.anchor_group === "low");
-      const highRows = rows.filter(r => r.anchor_group === "high");
+      const productItems = productStats(productRows);
+      const extraItems = extraStats(extraRows);
 
-      const lowOverall = average(lowRows.map(r => r.estimated_price));
-      const highOverall = average(highRows.map(r => r.estimated_price));
-      const overallDiff = lowOverall !== null && highOverall !== null ? highOverall - lowOverall : null;
-      const overallPercentDiff = percentDiffValue(highOverall, lowOverall);
+      const productAvgAbs = averageAbsoluteFromItems(productItems);
+      const productAvgPercent = averagePercentFromItems(productItems);
+
+      const extraAvgAbs = averageAbsoluteFromItems(extraItems);
+      const extraAvgPercent = averagePercentFromItems(extraItems);
 
       const lowParticipants = participants.filter(p => p.anchor_group === "low").length;
       const highParticipants = participants.filter(p => p.anchor_group === "high").length;
@@ -1144,99 +1395,94 @@
           </div>
 
           <div class="metric">
-            <h3>Gespeicherte Antworten</h3>
-            <div class="big">${rows.length}</div>
-            <p class="small">Maximal 5 Antworten pro Person</p>
+            <h3>Produktantworten</h3>
+            <div class="big">${productRows.length}</div>
+            <p class="small">Maximal 5 pro Person</p>
           </div>
 
-          <div class="metric low">
-            <h3>Ø tief</h3>
-            <div class="big">${lowOverall === null ? "-" : formatCHF(lowOverall)}</div>
-            <p class="small">durchschnittliche Zahlungsbereitschaft</p>
-          </div>
-
-          <div class="metric high">
-            <h3>Ø hoch</h3>
-            <div class="big">${highOverall === null ? "-" : formatCHF(highOverall)}</div>
-            <p class="small">durchschnittliche Zahlungsbereitschaft</p>
+          <div class="metric">
+            <h3>Zusatzantworten</h3>
+            <div class="big">${extraRows.length}</div>
+            <p class="small">Maximal 3 pro Person</p>
           </div>
 
           <div class="metric diff">
-            <h3>Effekt absolut</h3>
-            <div class="big ${diffClass(overallDiff)}">
-              ${formatDiff(overallDiff)}
-            </div>
-            <p class="small">hoch minus tief</p>
+            <h3>Produkte absolut</h3>
+            <div class="big ${diffClass(productAvgAbs)}">${formatDiff(productAvgAbs)}</div>
+            <p class="small">Durchschnitt der 5 Einzeleffekte</p>
           </div>
 
           <div class="metric percent">
-            <h3>Effekt prozentual</h3>
-            <div class="big ${diffClass(overallPercentDiff)}">
-              ${formatPercent(overallPercentDiff)}
-            </div>
-            <p class="small">(hoch - tief) / tief</p>
+            <h3>Produkte prozentual</h3>
+            <div class="big ${diffClass(productAvgPercent)}">${formatPercent(productAvgPercent)}</div>
+            <p class="small">Durchschnitt der 5 Prozentwerte</p>
+          </div>
+
+          <div class="metric diff">
+            <h3>Zusatz absolut</h3>
+            <div class="big ${diffClass(extraAvgAbs)}">${extraAvgAbs === null ? "-" : formatGenericDiff(extraAvgAbs, "Einheiten")}</div>
+            <p class="small">Durchschnitt der 3 Einzeleffekte</p>
+          </div>
+
+          <div class="metric percent">
+            <h3>Zusatz prozentual</h3>
+            <div class="big ${diffClass(extraAvgPercent)}">${formatPercent(extraAvgPercent)}</div>
+            <p class="small">Durchschnitt der 3 Prozentwerte</p>
           </div>
         </div>
       `;
 
       let html = `
         <div class="card">
-          <h3>Detailauswertung pro Angebot</h3>
-          <p class="muted">Pro Angebot sehen Sie den absoluten und prozentualen Unterschied zwischen den beiden Gruppen.</p>
+          <h3>Test 1: Produkte und Angebote</h3>
+          <p class="muted">
+            Hier wird nur der Produktteil ausgewertet. Der prozentuale Gesamteffekt ist der Durchschnitt der einzelnen Prozentwerte pro Angebot.
+          </p>
           <div class="result-card-grid">
       `;
 
-      products.forEach(product => {
-        const productRows = rows.filter(r => r.product_id === product.id);
-        const lows = productRows.filter(r => r.anchor_group === "low");
-        const highs = productRows.filter(r => r.anchor_group === "high");
-
-        const lowAvg = average(lows.map(r => r.estimated_price));
-        const highAvg = average(highs.map(r => r.estimated_price));
-        const diff = lowAvg !== null && highAvg !== null ? highAvg - lowAvg : null;
-        const percentDiff = percentDiffValue(highAvg, lowAvg);
-
+      productItems.forEach(item => {
         const maxVal = Math.max(
-          product.highPrice,
-          lowAvg || 0,
-          highAvg || 0,
+          item.product.highPrice,
+          item.lowAvg || 0,
+          item.highAvg || 0,
           1
         );
 
-        const lowWidth = lowAvg === null ? 0 : Math.min(100, (lowAvg / maxVal) * 100);
-        const highWidth = highAvg === null ? 0 : Math.min(100, (highAvg / maxVal) * 100);
+        const lowWidth = item.lowAvg === null ? 0 : Math.min(100, (item.lowAvg / maxVal) * 100);
+        const highWidth = item.highAvg === null ? 0 : Math.min(100, (item.highAvg / maxVal) * 100);
 
         html += `
           <div class="result-card">
-            <h4>${product.targetName}</h4>
-            <div class="small">${product.info}</div>
+            <h4>${item.product.targetName}</h4>
+            <div class="small">${item.product.info}</div>
 
             <div class="result-row">
               <div class="result-box low">
                 <div class="result-label">Tiefer Vergleichspreis</div>
-                <div class="result-value">${formatCHF(product.lowPrice)}</div>
+                <div class="result-value">${formatCHF(item.product.lowPrice)}</div>
                 <div class="result-label">Ø Zahlungsbereitschaft</div>
-                <div class="result-value">${lowAvg === null ? "-" : formatCHF(lowAvg)}</div>
-                <div class="small">n = ${lows.length}</div>
+                <div class="result-value">${item.lowAvg === null ? "-" : formatCHF(item.lowAvg)}</div>
+                <div class="small">n = ${item.lows.length}</div>
                 <div class="bar-wrap"><div class="bar lowbar" style="width:${lowWidth}%"></div></div>
               </div>
 
               <div class="result-box high">
                 <div class="result-label">Hoher Vergleichspreis</div>
-                <div class="result-value">${formatCHF(product.highPrice)}</div>
+                <div class="result-value">${formatCHF(item.product.highPrice)}</div>
                 <div class="result-label">Ø Zahlungsbereitschaft</div>
-                <div class="result-value">${highAvg === null ? "-" : formatCHF(highAvg)}</div>
-                <div class="small">n = ${highs.length}</div>
+                <div class="result-value">${item.highAvg === null ? "-" : formatCHF(item.highAvg)}</div>
+                <div class="small">n = ${item.highs.length}</div>
                 <div class="bar-wrap"><div class="bar highbar" style="width:${highWidth}%"></div></div>
               </div>
             </div>
 
             <div>
-              <span class="diff-pill ${diffClass(diff)}">
-                Absolut: ${formatDiff(diff)}
+              <span class="diff-pill ${diffClass(item.diff)}">
+                Absolut: ${formatDiff(item.diff)}
               </span>
               <span class="percent-pill">
-                Prozentual: ${formatPercent(percentDiff)}
+                Prozentual: ${formatPercent(item.percent)}
               </span>
             </div>
           </div>
@@ -1244,6 +1490,97 @@
       });
 
       html += `
+          </div>
+
+          <div class="card">
+            <h3>Zusammenfassung Test 1</h3>
+            <p>
+              Durchschnittlicher absoluter Effekt:
+              <strong class="${diffClass(productAvgAbs)}">${formatDiff(productAvgAbs)}</strong>
+            </p>
+            <p>
+              Durchschnittlicher prozentualer Effekt:
+              <strong class="${diffClass(productAvgPercent)}">${formatPercent(productAvgPercent)}</strong>
+            </p>
+            <p class="muted">
+              Wichtig: Der Prozentwert wird aus den einzelnen Prozentwerten pro Angebot gemittelt, nicht aus allen Antworten zusammen neu berechnet.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Test 2: Zusatzfragen</h3>
+          <p class="muted">
+            Hier werden nur die drei Wissens-Schätzfragen ausgewertet.
+          </p>
+          <div class="result-card-grid">
+      `;
+
+      extraItems.forEach(item => {
+        const maxVal = Math.max(
+          item.question.highAnchor,
+          item.question.correctValue,
+          item.lowAvg || 0,
+          item.highAvg || 0,
+          1
+        );
+
+        const lowWidth = item.lowAvg === null ? 0 : Math.min(100, (item.lowAvg / maxVal) * 100);
+        const highWidth = item.highAvg === null ? 0 : Math.min(100, (item.highAvg / maxVal) * 100);
+
+        html += `
+          <div class="result-card">
+            <h4>${item.question.name}</h4>
+            <div class="small">Richtige Lösung: ca. ${formatExtraValue(item.question.correctValue, item.question.unit)}</div>
+
+            <div class="result-row">
+              <div class="result-box low">
+                <div class="result-label">Tiefer Startwert</div>
+                <div class="result-value">${formatExtraValue(item.question.lowAnchor, item.question.unit)}</div>
+                <div class="result-label">Ø Schätzung</div>
+                <div class="result-value">${item.lowAvg === null ? "-" : formatExtraValue(item.lowAvg, item.question.unit)}</div>
+                <div class="small">n = ${item.lows.length}</div>
+                <div class="bar-wrap"><div class="bar lowbar" style="width:${lowWidth}%"></div></div>
+              </div>
+
+              <div class="result-box high">
+                <div class="result-label">Hoher Startwert</div>
+                <div class="result-value">${formatExtraValue(item.question.highAnchor, item.question.unit)}</div>
+                <div class="result-label">Ø Schätzung</div>
+                <div class="result-value">${item.highAvg === null ? "-" : formatExtraValue(item.highAvg, item.question.unit)}</div>
+                <div class="small">n = ${item.highs.length}</div>
+                <div class="bar-wrap"><div class="bar highbar" style="width:${highWidth}%"></div></div>
+              </div>
+            </div>
+
+            <div>
+              <span class="diff-pill ${diffClass(item.diff)}">
+                Absolut: ${formatGenericDiff(item.diff, item.question.unit)}
+              </span>
+              <span class="percent-pill">
+                Prozentual: ${formatPercent(item.percent)}
+              </span>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+
+          <div class="card">
+            <h3>Zusammenfassung Test 2</h3>
+            <p>
+              Durchschnittlicher absoluter Effekt:
+              <strong class="${diffClass(extraAvgAbs)}">${extraAvgAbs === null ? "-" : formatGenericDiff(extraAvgAbs, "Einheiten")}</strong>
+            </p>
+            <p>
+              Durchschnittlicher prozentualer Effekt:
+              <strong class="${diffClass(extraAvgPercent)}">${formatPercent(extraAvgPercent)}</strong>
+            </p>
+            <p class="muted">
+              Wichtig: Der Prozentwert wird aus den einzelnen Prozentwerten pro Zusatzfrage gemittelt, nicht aus allen Antworten zusammen neu berechnet.
+            </p>
           </div>
         </div>
 
@@ -1266,33 +1603,15 @@
         </div>
 
         <div class="card">
-          <h3>Gesamtzusammenfassung</h3>
-          <p>
-            Im Durchschnitt lag die Zahlungsbereitschaft der Gruppe mit hohen Vergleichspreisen bei
-            <strong>${highOverall === null ? "-" : formatCHF(highOverall)}</strong>.
-            Die Zahlungsbereitschaft der Gruppe mit tiefen Vergleichspreisen lag bei
-            <strong>${lowOverall === null ? "-" : formatCHF(lowOverall)}</strong>.
-          </p>
-          <p>
-            Der absolute Unterschied beträgt
-            <strong class="${diffClass(overallDiff)}">${formatDiff(overallDiff)}</strong>.
-            Der prozentuale Unterschied beträgt
-            <strong class="${diffClass(overallPercentDiff)}">${formatPercent(overallPercentDiff)}</strong>.
-          </p>
-          <p class="muted">
-            Formel: prozentualer Unterschied = (Ø hoch - Ø tief) / Ø tief × 100.
-          </p>
-        </div>
-
-        <div class="card">
           <h3>Auswertungssatz</h3>
           <p>
-            Beide Gruppen haben dieselben neuen Produkte und Angebote bewertet.
-            Der Unterschied war, dass eine Gruppe vorher tiefere Preise und eine Gruppe vorher höhere Preise gesehen hat.
+            Im ersten Test haben beide Gruppen dieselben Produkte und Angebote bewertet.
+            Im zweiten Test haben beide Gruppen dieselben Wissensfragen geschätzt.
+            Der Unterschied war jeweils, dass eine Gruppe vorher tiefere Werte und eine Gruppe vorher höhere Werte gesehen hat.
           </p>
           <p>
-            Wenn die Zahlungsbereitschaft in der Gruppe mit hohen Preisen höher liegt, sieht man den Ankereffekt:
-            Ein vorher gesehener Wert beeinflusst, was danach als angemessen empfunden wird.
+            Wenn die Gruppe mit hohen Startwerten im Durchschnitt höher schätzt, sieht man den Ankereffekt:
+            Ein zuerst gesehener Wert beeinflusst, was danach als angemessen oder realistisch empfunden wird.
           </p>
         </div>
       `;
@@ -1300,11 +1619,25 @@
       tableDiv.innerHTML = html;
     }
 
+    function formatExtraValue(value, unit) {
+      if (unit === "Mio. Einwohner/innen") {
+        return Number(value).toFixed(1) + " Mio.";
+      }
+
+      if (unit === "km") {
+        return Number(value).toLocaleString("de-CH", { maximumFractionDigits: 0 }) + " km";
+      }
+
+      if (unit === "km²") {
+        return Number(value).toLocaleString("de-CH", { maximumFractionDigits: 0 }) + " km²";
+      }
+
+      return Number(value).toFixed(1) + " " + unit;
+    }
+
     async function resetData() {
       const confirmReset = confirm("Wirklich alle Daten dieser Session löschen?");
-      if (!confirmReset) {
-        return;
-      }
+      if (!confirmReset) return;
 
       const { error } = await client.rpc("reset_anchor_experiment", {
         p_session_id: SESSION_ID
