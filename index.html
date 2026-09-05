@@ -24,6 +24,7 @@
       --red-bg: #fae8e5;
       --yellow-bg: #fff4dd;
       --yellow-border: #f0c36d;
+      --grey-bg: #eeeeee;
     }
 
     * {
@@ -115,6 +116,11 @@
       background: #555;
     }
 
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     input {
       width: 100%;
       max-width: 260px;
@@ -183,10 +189,29 @@
       font-size: 0.9rem;
     }
 
+    .reaction-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    .reaction-timer {
+      background: #fbf8f4;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
     .reaction-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 10px;
       margin-top: 18px;
     }
 
@@ -194,16 +219,26 @@
       border: 1px solid var(--border);
       background: white;
       border-radius: 14px;
-      padding: 18px 12px;
-      font-size: 1.05rem;
+      padding: 18px 8px;
+      min-height: 62px;
+      font-size: 1rem;
       font-weight: bold;
       cursor: pointer;
       text-align: center;
       color: var(--text);
     }
 
-    .reaction-tile:hover {
-      background: #fbf8f4;
+    .reaction-tile.covered {
+      background: #ddd5cd;
+      color: transparent;
+      cursor: default;
+    }
+
+    .reaction-tile.covered::after {
+      content: "?";
+      color: #7a6b5e;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
 
     .reaction-tile.correct {
@@ -257,6 +292,11 @@
       font-size: 2rem;
       font-weight: bold;
       color: var(--accent);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      width: 100%;
     }
 
     table {
@@ -342,6 +382,16 @@
         font-size: 2rem;
       }
 
+      .reaction-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .reaction-tile {
+        min-height: 56px;
+        padding: 14px 6px;
+        font-size: 0.9rem;
+      }
+
       table {
         font-size: 0.82rem;
       }
@@ -411,7 +461,12 @@
       <h2>Kurze Konzentrationsaufgabe</h2>
 
       <p>Klicken Sie so schnell wie möglich auf alle Felder mit dem Wort <strong>Marke</strong>.</p>
-      <p class="muted">Arbeiten Sie weiterhin alleine und ohne zu sprechen.</p>
+      <p class="muted">Die Felder werden erst nach dem Start aufgedeckt. Arbeiten Sie weiterhin alleine und ohne zu sprechen.</p>
+
+      <div class="reaction-top">
+        <button id="reactionStartButton" onclick="startReactionGame()">Start</button>
+        <div id="reactionTimer" class="reaction-timer">Zeit: 0.0 s</div>
+      </div>
 
       <div id="reactionGrid" class="reaction-grid"></div>
 
@@ -469,6 +524,7 @@
       <input id="teacherPassword" type="password" placeholder="Passwort" />
       <br>
       <button onclick="openTeacherView()">Resultate anzeigen</button>
+      <button class="secondary" onclick="backToStudentMode()">Zurück zum Lernendenmodus</button>
     </section>
 
     <section id="teacherView" class="card hidden">
@@ -478,6 +534,7 @@
       </p>
 
       <button onclick="loadResults()">Resultate aktualisieren</button>
+      <button class="secondary" onclick="backToStudentMode()">Zurück zum Lernendenmodus</button>
       <button class="danger" onclick="resetData()">Daten zurücksetzen</button>
 
       <div id="resultsSummary"></div>
@@ -549,26 +606,23 @@
       }
     ];
 
-    const reactionWords = [
-      "Produkt",
-      "Marke",
-      "Design",
-      "Zielgruppe",
-      "Marke",
-      "Werbung",
-      "Verpackung",
-      "Kunde",
-      "Marke",
-      "Qualität",
-      "Angebot",
-      "Marke"
+    const reactionWordsOriginal = [
+      "Produkt", "Marke", "Design", "Zielgruppe", "Farbe", "Werbung",
+      "Verpackung", "Kunde", "Angebot", "Qualität", "Logo", "Marke",
+      "Verkauf", "Marke", "Nutzen", "Material", "Form", "Marke",
+      "Geschmack", "Service", "Trend", "Name", "Bild", "Aktion"
     ];
 
     let participant = null;
     let anchorIndex = 0;
     let willingnessIndex = 0;
+    let willingnessOrder = [];
+    let reactionWords = [];
     let foundMarkeCount = 0;
+    let totalMarkeCount = 0;
     let reactionStartedAt = null;
+    let reactionTimerInterval = null;
+    let reactionActive = false;
 
     function hideAllViews() {
       [
@@ -588,8 +642,30 @@
       return "CHF " + Number(value).toFixed(2);
     }
 
+    function shuffleArray(array) {
+      const copy = [...array];
+
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temp;
+      }
+
+      return copy;
+    }
+
     function getAnchorPrice(product) {
       return participant.anchor_group === "low" ? product.lowPrice : product.highPrice;
+    }
+
+    function resetSessionForNewRun() {
+      sessionStorage.removeItem("anchor_experiment_participant");
+      sessionStorage.removeItem("anchor_experiment_willingness_order");
+      participant = null;
+      anchorIndex = 0;
+      willingnessIndex = 0;
+      willingnessOrder = [];
     }
 
     async function startExperiment() {
@@ -609,6 +685,21 @@
 
         participant = Array.isArray(data) ? data[0] : data;
         sessionStorage.setItem("anchor_experiment_participant", JSON.stringify(participant));
+      }
+
+      const existingOrder = sessionStorage.getItem("anchor_experiment_willingness_order");
+
+      if (existingOrder) {
+        const ids = JSON.parse(existingOrder);
+        willingnessOrder = ids
+          .map(id => products.find(product => product.id === id))
+          .filter(Boolean);
+      } else {
+        willingnessOrder = shuffleArray(products);
+        sessionStorage.setItem(
+          "anchor_experiment_willingness_order",
+          JSON.stringify(willingnessOrder.map(product => product.id))
+        );
       }
 
       anchorIndex = 0;
@@ -649,27 +740,42 @@
     }
 
     function showReactionGame() {
+      stopReactionTimer();
+
       hideAllViews();
       document.getElementById("reactionView").classList.remove("hidden");
 
+      reactionWords = shuffleArray(reactionWordsOriginal);
       foundMarkeCount = 0;
-      reactionStartedAt = Date.now();
+      totalMarkeCount = reactionWords.filter(word => word === "Marke").length;
+      reactionStartedAt = null;
+      reactionActive = false;
 
       const grid = document.getElementById("reactionGrid");
       const feedback = document.getElementById("reactionFeedback");
       const continueButton = document.getElementById("reactionContinueButton");
+      const startButton = document.getElementById("reactionStartButton");
+      const timer = document.getElementById("reactionTimer");
 
       grid.innerHTML = "";
       feedback.textContent = "";
+      timer.textContent = "Zeit: 0.0 s";
       continueButton.classList.add("hidden");
+      startButton.disabled = false;
 
       reactionWords.forEach((word) => {
         const button = document.createElement("button");
         button.type = "button";
-        button.className = "reaction-tile";
+        button.className = "reaction-tile covered";
+        button.dataset.word = word;
         button.textContent = word;
+        button.disabled = true;
 
         button.addEventListener("click", () => {
+          if (!reactionActive) {
+            return;
+          }
+
           if (button.classList.contains("correct") || button.classList.contains("wrong")) {
             return;
           }
@@ -678,10 +784,8 @@
             button.classList.add("correct");
             foundMarkeCount++;
 
-            if (foundMarkeCount === 4) {
-              const seconds = ((Date.now() - reactionStartedAt) / 1000).toFixed(1);
-              feedback.textContent = "Geschafft in " + seconds + " Sekunden.";
-              continueButton.classList.remove("hidden");
+            if (foundMarkeCount === totalMarkeCount) {
+              finishReactionGame();
             }
           } else {
             button.classList.add("wrong");
@@ -694,6 +798,56 @@
 
         grid.appendChild(button);
       });
+    }
+
+    function startReactionGame() {
+      const tiles = document.querySelectorAll(".reaction-tile");
+      const startButton = document.getElementById("reactionStartButton");
+      const feedback = document.getElementById("reactionFeedback");
+
+      foundMarkeCount = 0;
+      reactionStartedAt = Date.now();
+      reactionActive = true;
+
+      feedback.textContent = "";
+      startButton.disabled = true;
+
+      tiles.forEach(tile => {
+        tile.classList.remove("covered", "correct", "wrong");
+        tile.disabled = false;
+      });
+
+      stopReactionTimer();
+
+      reactionTimerInterval = setInterval(() => {
+        const seconds = ((Date.now() - reactionStartedAt) / 1000).toFixed(1);
+        document.getElementById("reactionTimer").textContent = "Zeit: " + seconds + " s";
+      }, 100);
+    }
+
+    function stopReactionTimer() {
+      if (reactionTimerInterval) {
+        clearInterval(reactionTimerInterval);
+        reactionTimerInterval = null;
+      }
+    }
+
+    function finishReactionGame() {
+      reactionActive = false;
+      stopReactionTimer();
+
+      const seconds = ((Date.now() - reactionStartedAt) / 1000).toFixed(1);
+      const feedback = document.getElementById("reactionFeedback");
+      const continueButton = document.getElementById("reactionContinueButton");
+      const tiles = document.querySelectorAll(".reaction-tile");
+
+      tiles.forEach(tile => {
+        tile.disabled = true;
+      });
+
+      document.getElementById("reactionTimer").textContent = "Zeit: " + seconds + " s";
+      feedback.textContent = "Geschafft in " + seconds + " Sekunden.";
+      continueButton.classList.remove("hidden");
     }
 
     function showWillingnessIntro() {
@@ -709,10 +863,10 @@
     }
 
     function renderWillingnessItem() {
-      const product = products[willingnessIndex];
+      const product = willingnessOrder[willingnessIndex];
 
       document.getElementById("willingnessProgress").textContent =
-        "Einschätzung " + (willingnessIndex + 1) + " von " + products.length;
+        "Einschätzung " + (willingnessIndex + 1) + " von " + willingnessOrder.length;
 
       document.getElementById("targetName").textContent = product.targetName;
       document.getElementById("targetInfo").textContent = product.info;
@@ -733,7 +887,7 @@
         return;
       }
 
-      const product = products[willingnessIndex];
+      const product = willingnessOrder[willingnessIndex];
       const anchorPrice = getAnchorPrice(product);
 
       const row = {
@@ -758,7 +912,7 @@
 
       willingnessIndex++;
 
-      if (willingnessIndex >= products.length) {
+      if (willingnessIndex >= willingnessOrder.length) {
         hideAllViews();
         document.getElementById("doneView").classList.remove("hidden");
       } else {
@@ -784,8 +938,17 @@
       loadResults();
     }
 
+    function backToStudentMode() {
+      stopReactionTimer();
+      hideAllViews();
+      document.getElementById("startView").classList.remove("hidden");
+    }
+
     function average(values) {
-      if (!values.length) return null;
+      if (!values.length) {
+        return null;
+      }
+
       return values.reduce((sum, value) => sum + Number(value), 0) / values.length;
     }
 
@@ -873,21 +1036,22 @@
       let html = `
         <div class="card">
           <h3>Detailauswertung pro Angebot</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Angebot</th>
-                <th class="low-cell">Tiefer Vergleichspreis</th>
-                <th class="low-cell">Ø Zahlungsbereitschaft</th>
-                <th class="low-cell">n</th>
-                <th class="high-cell">Hoher Vergleichspreis</th>
-                <th class="high-cell">Ø Zahlungsbereitschaft</th>
-                <th class="high-cell">n</th>
-                <th>Unterschied</th>
-                <th>Visualisierung</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Angebot</th>
+                  <th class="low-cell">Tiefer Vergleichspreis</th>
+                  <th class="low-cell">Ø Zahlungsbereitschaft</th>
+                  <th class="low-cell">n</th>
+                  <th class="high-cell">Hoher Vergleichspreis</th>
+                  <th class="high-cell">Ø Zahlungsbereitschaft</th>
+                  <th class="high-cell">n</th>
+                  <th>Unterschied</th>
+                  <th>Visualisierung</th>
+                </tr>
+              </thead>
+              <tbody>
       `;
 
       products.forEach(product => {
@@ -930,8 +1094,9 @@
       });
 
       html += `
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="card">
@@ -939,15 +1104,16 @@
           <p class="muted">
             Zur Kontrolle: Jede neu startende Person wird abwechselnd zugeteilt.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>Person</th>
-                <th>Gruppe</th>
-                <th>Zeitpunkt</th>
-              </tr>
-            </thead>
-            <tbody>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Gruppe</th>
+                  <th>Zeitpunkt</th>
+                </tr>
+              </thead>
+              <tbody>
       `;
 
       participants.forEach(p => {
@@ -963,8 +1129,9 @@
       });
 
       html += `
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div class="card">
@@ -985,7 +1152,9 @@
 
     async function resetData() {
       const confirmReset = confirm("Wirklich alle Daten dieser Session löschen?");
-      if (!confirmReset) return;
+      if (!confirmReset) {
+        return;
+      }
 
       const { error } = await client.rpc("reset_anchor_experiment", {
         p_session_id: SESSION_ID
@@ -996,7 +1165,7 @@
         return;
       }
 
-      sessionStorage.removeItem("anchor_experiment_participant");
+      resetSessionForNewRun();
       alert("Daten wurden zurückgesetzt.");
       loadResults();
     }
