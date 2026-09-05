@@ -14,10 +14,9 @@
       --text: #1f1f1f;
       --muted: #666;
       --accent: #7a3f22;
-      --accent2: #d9b99b;
+      --border: #e2d8ce;
       --green: #2f7d4c;
       --red: #b8432e;
-      --border: #e2d8ce;
     }
 
     * {
@@ -44,7 +43,7 @@
     }
 
     main {
-      max-width: 1050px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 22px;
     }
@@ -53,7 +52,7 @@
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 22px;
+      padding: 24px;
       margin-bottom: 18px;
       box-shadow: 0 4px 18px rgba(0,0,0,0.05);
     }
@@ -63,11 +62,7 @@
       color: var(--accent);
     }
 
-    h3 {
-      margin-bottom: 8px;
-    }
-
-    p {
+    p, li {
       line-height: 1.45;
     }
 
@@ -100,10 +95,6 @@
       opacity: 0.9;
     }
 
-    button.secondary {
-      background: #555;
-    }
-
     button.danger {
       background: var(--red);
     }
@@ -122,36 +113,6 @@
       display: none;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-    }
-
-    .product-card {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      background: #fff;
-      text-align: center;
-    }
-
-    .product-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: contain;
-      border-radius: 12px;
-      background: #fafafa;
-      margin-bottom: 12px;
-    }
-
-    .price {
-      font-size: 1.9rem;
-      font-weight: bold;
-      color: var(--accent);
-      margin: 10px 0;
-    }
-
     .step {
       font-size: 0.9rem;
       color: white;
@@ -162,19 +123,31 @@
       margin-bottom: 10px;
     }
 
-    .question-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-      align-items: center;
+    .product-single {
+      text-align: center;
     }
 
-    .question-box img {
+    .product-single img {
       width: 100%;
-      max-height: 340px;
+      max-height: 480px;
       object-fit: contain;
       border-radius: 14px;
       background: #fafafa;
+      border: 1px solid var(--border);
+      margin: 16px 0;
+    }
+
+    .price {
+      font-size: 2.3rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 14px 0;
+    }
+
+    .progress {
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: bold;
     }
 
     .answer-panel {
@@ -182,6 +155,8 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 18px;
+      margin-top: 14px;
+      text-align: left;
     }
 
     table {
@@ -206,11 +181,6 @@
       font-weight: bold;
     }
 
-    .negative {
-      color: var(--red);
-      font-weight: bold;
-    }
-
     .teacher-link {
       text-align: center;
       margin-top: 30px;
@@ -220,12 +190,16 @@
     }
 
     @media (max-width: 760px) {
-      .question-box {
-        grid-template-columns: 1fr;
+      main {
+        padding: 14px;
       }
 
-      .product-card img {
-        height: 180px;
+      .product-single img {
+        max-height: 340px;
+      }
+
+      .price {
+        font-size: 2rem;
       }
     }
   </style>
@@ -237,15 +211,12 @@
   </header>
 
   <main>
-
     <section id="startView" class="card">
       <h2>Wichtig vor dem Start</h2>
 
       <div class="warning">
         Dieses Preisexperiment funktioniert nur, wenn alle verdeckt, alleine und ohne zu sprechen arbeiten.
       </div>
-
-      <p>Bitte beachten Sie:</p>
 
       <ol>
         <li>Bearbeiten Sie das Experiment komplett alleine.</li>
@@ -261,39 +232,58 @@
       <button onclick="startExperiment()">Experiment starten</button>
     </section>
 
-    <section id="anchorView" class="card hidden">
+    <section id="anchorIntroView" class="card hidden">
       <span class="step">Teil 1</span>
       <h2>Marktüberblick</h2>
-      <p>Schauen Sie sich die folgenden Vergleichsprodukte und Vergleichsangebote mit Preisen kurz an.</p>
+
+      <p>Sie sehen jetzt einige Vergleichsprodukte und Vergleichsangebote mit Preisen.</p>
+      <p>Schauen Sie sich jedes Angebot kurz an.</p>
       <p class="muted">Sie müssen hier noch nichts eingeben.</p>
 
-      <div id="anchorGrid" class="grid"></div>
-
-      <button onclick="showEstimationView()">Weiter zur Preisschätzung</button>
+      <button onclick="showAnchorItem()">Weiter</button>
     </section>
 
-    <section id="estimateView" class="card hidden">
+    <section id="anchorItemView" class="card hidden">
+      <span class="step">Teil 1</span>
+      <div class="product-single">
+        <div id="anchorProgress" class="progress"></div>
+        <h2 id="anchorName"></h2>
+        <p id="anchorInfo" class="muted"></p>
+        <img id="anchorImage" src="" alt="Vergleichsprodukt">
+        <div id="anchorPrice" class="price"></div>
+        <button onclick="nextAnchorItem()">Weiter</button>
+      </div>
+    </section>
+
+    <section id="estimateIntroView" class="card hidden">
       <span class="step">Teil 2</span>
-      <h2 id="estimateTitle">Preisschätzung</h2>
+      <h2>Zahlungsbereitschaft</h2>
 
       <p>Nun sehen Sie neue Produkte und Angebote ohne Preis.</p>
-      <p>Schätzen Sie jeweils, welcher Preis angemessen erscheint.</p>
+      <p>Schätzen Sie jeweils, welcher Preis für dieses neue Produkt oder Angebot angemessen erscheint.</p>
 
-      <div class="question-box">
-        <div>
-          <img id="targetImage" src="" alt="Neues Produkt oder Angebot">
-        </div>
+      <div class="warning">
+        Entscheiden Sie nach Ihrem persönlichen Preisgefühl. Kopieren Sie nicht automatisch einen vorher gesehenen Preis.
+      </div>
+
+      <button onclick="showEstimateItem()">Zur ersten Schätzung</button>
+    </section>
+
+    <section id="estimateItemView" class="card hidden">
+      <span class="step">Teil 2</span>
+      <div class="product-single">
+        <div id="estimateProgress" class="progress"></div>
+        <h2 id="targetName"></h2>
+        <p id="targetInfo" class="muted"></p>
+        <img id="targetImage" src="" alt="Neues Produkt oder Angebot">
 
         <div class="answer-panel">
-          <h3 id="targetName"></h3>
-          <p id="targetInfo" class="muted"></p>
-
-          <label for="priceInput"><strong>Welcher Preis erscheint angemessen?</strong></label>
+          <label for="priceInput"><strong>Welcher Preis erscheint Ihnen angemessen?</strong></label>
           <br>
           <input id="priceInput" type="number" min="0" step="0.05" placeholder="CHF" />
 
           <p class="muted">
-            Entscheiden Sie nach Ihrem persönlichen Preisgefühl. Das neue Produkt oder Angebot kann günstiger, gleich teuer oder teurer sein als die Vergleichsangebote von vorher.
+            Das neue Produkt oder Angebot kann günstiger, gleich teuer oder teurer sein als die Vergleichsangebote von vorher.
           </p>
 
           <button onclick="saveEstimate()">Antwort speichern</button>
@@ -329,7 +319,6 @@
     </section>
 
     <div class="teacher-link" onclick="showTeacherLogin()">Lehrermodus</div>
-
   </main>
 
   <script>
@@ -347,8 +336,8 @@
         anchorName: "Vergleichs-Eistee",
         targetName: "Natura Premium Eistee",
         info: "500 ml",
-        anchorImage: "img/anker/1a.png",
-        targetImage: "img/anker/1n.png",
+        anchorImage: "1a.png",
+        targetImage: "1n.png",
         lowPrice: 1.40,
         highPrice: 2.60
       },
@@ -357,8 +346,8 @@
         anchorName: "Vergleichs-Chips",
         targetName: "Golden Harvest Chips",
         info: "150 g",
-        anchorImage: "img/anker/2a.png",
-        targetImage: "img/anker/2n.png",
+        anchorImage: "2a.png",
+        targetImage: "2n.png",
         lowPrice: 2.40,
         highPrice: 3.80
       },
@@ -367,8 +356,8 @@
         anchorName: "Vergleichs-Duschgel",
         targetName: "Pure Care Duschgel",
         info: "250 ml",
-        anchorImage: "img/anker/3a.png",
-        targetImage: "img/anker/3n.png",
+        anchorImage: "3a.png",
+        targetImage: "3n.png",
         lowPrice: 2.50,
         highPrice: 4.50
       },
@@ -377,8 +366,8 @@
         anchorName: "Vergleichs-Escape-Room",
         targetName: "Escape Room, Operation Bankraub",
         info: "60 Minuten, 1 Person",
-        anchorImage: "img/anker/4a.png",
-        targetImage: "img/anker/4n.png",
+        anchorImage: "4a.png",
+        targetImage: "4n.png",
         lowPrice: 29,
         highPrice: 45
       },
@@ -387,27 +376,36 @@
         anchorName: "Vergleichs-Fitnessabo",
         targetName: "FitLife Fitnessabo",
         info: "1 Monat, Standardzugang",
-        anchorImage: "img/anker/5a.png",
-        targetImage: "img/anker/5n.png",
+        anchorImage: "5a.png",
+        targetImage: "5n.png",
         lowPrice: 39,
         highPrice: 69
       }
     ];
 
     let participant = null;
-    let currentIndex = 0;
+    let anchorIndex = 0;
+    let estimateIndex = 0;
 
     function hideAllViews() {
-      document.getElementById("startView").classList.add("hidden");
-      document.getElementById("anchorView").classList.add("hidden");
-      document.getElementById("estimateView").classList.add("hidden");
-      document.getElementById("doneView").classList.add("hidden");
-      document.getElementById("teacherLoginView").classList.add("hidden");
-      document.getElementById("teacherView").classList.add("hidden");
+      [
+        "startView",
+        "anchorIntroView",
+        "anchorItemView",
+        "estimateIntroView",
+        "estimateItemView",
+        "doneView",
+        "teacherLoginView",
+        "teacherView"
+      ].forEach(id => document.getElementById(id).classList.add("hidden"));
     }
 
     function formatCHF(value) {
       return "CHF " + Number(value).toFixed(2);
+    }
+
+    function getAnchorPrice(product) {
+      return participant.anchor_group === "low" ? product.lowPrice : product.highPrice;
     }
 
     async function startExperiment() {
@@ -429,53 +427,65 @@
         localStorage.setItem("anchor_experiment_participant", JSON.stringify(participant));
       }
 
-      renderAnchors();
+      anchorIndex = 0;
+      estimateIndex = 0;
+
       hideAllViews();
-      document.getElementById("anchorView").classList.remove("hidden");
+      document.getElementById("anchorIntroView").classList.remove("hidden");
     }
 
-    function getAnchorPrice(product) {
-      return participant.anchor_group === "low" ? product.lowPrice : product.highPrice;
-    }
-
-    function renderAnchors() {
-      const grid = document.getElementById("anchorGrid");
-      grid.innerHTML = "";
-
-      products.forEach(product => {
-        const price = getAnchorPrice(product);
-
-        const card = document.createElement("div");
-        card.className = "product-card";
-        card.innerHTML = `
-          <img src="${product.anchorImage}" alt="${product.anchorName}">
-          <h3>${product.anchorName}</h3>
-          <p class="muted">${product.info}</p>
-          <div class="price">${formatCHF(price)}</div>
-        `;
-
-        grid.appendChild(card);
-      });
-    }
-
-    function showEstimationView() {
-      currentIndex = 0;
+    function showAnchorItem() {
+      anchorIndex = 0;
       hideAllViews();
-      document.getElementById("estimateView").classList.remove("hidden");
-      renderCurrentEstimate();
+      document.getElementById("anchorItemView").classList.remove("hidden");
+      renderAnchorItem();
     }
 
-    function renderCurrentEstimate() {
-      const product = products[currentIndex];
+    function renderAnchorItem() {
+      const product = products[anchorIndex];
+      const price = getAnchorPrice(product);
 
-      document.getElementById("estimateTitle").textContent =
-        "Preisschätzung " + (currentIndex + 1) + " von " + products.length;
+      document.getElementById("anchorProgress").textContent =
+        "Vergleichsangebot " + (anchorIndex + 1) + " von " + products.length;
 
-      document.getElementById("targetImage").src = product.targetImage;
+      document.getElementById("anchorName").textContent = product.anchorName;
+      document.getElementById("anchorInfo").textContent = product.info;
+      document.getElementById("anchorImage").src = product.anchorImage;
+      document.getElementById("anchorPrice").textContent = formatCHF(price);
+    }
+
+    function nextAnchorItem() {
+      anchorIndex++;
+
+      if (anchorIndex >= products.length) {
+        hideAllViews();
+        document.getElementById("estimateIntroView").classList.remove("hidden");
+      } else {
+        renderAnchorItem();
+      }
+    }
+
+    function showEstimateItem() {
+      estimateIndex = 0;
+      hideAllViews();
+      document.getElementById("estimateItemView").classList.remove("hidden");
+      renderEstimateItem();
+    }
+
+    function renderEstimateItem() {
+      const product = products[estimateIndex];
+
+      document.getElementById("estimateProgress").textContent =
+        "Preisschätzung " + (estimateIndex + 1) + " von " + products.length;
+
       document.getElementById("targetName").textContent = product.targetName;
       document.getElementById("targetInfo").textContent = product.info;
+      document.getElementById("targetImage").src = product.targetImage;
       document.getElementById("priceInput").value = "";
-      document.getElementById("priceInput").focus();
+
+      setTimeout(() => {
+        document.getElementById("priceInput").focus();
+      }, 100);
     }
 
     async function saveEstimate() {
@@ -487,7 +497,7 @@
         return;
       }
 
-      const product = products[currentIndex];
+      const product = products[estimateIndex];
       const anchorPrice = getAnchorPrice(product);
 
       const row = {
@@ -510,13 +520,13 @@
         return;
       }
 
-      currentIndex++;
+      estimateIndex++;
 
-      if (currentIndex >= products.length) {
+      if (estimateIndex >= products.length) {
         hideAllViews();
         document.getElementById("doneView").classList.remove("hidden");
       } else {
-        renderCurrentEstimate();
+        renderEstimateItem();
       }
     }
 
@@ -571,7 +581,7 @@
       summaryDiv.innerHTML = `
         <div class="card">
           <h3>Gesamteffekt</h3>
-          <p>Anzahl Antworten: <strong>${rows.length}</strong></p>
+          <p>Anzahl gespeicherte Antworten: <strong>${rows.length}</strong></p>
           <p>Durchschnitt Gruppe tiefer Anker: <strong>${lowOverall === null ? "noch keine Daten" : formatCHF(lowOverall)}</strong></p>
           <p>Durchschnitt Gruppe hoher Anker: <strong>${highOverall === null ? "noch keine Daten" : formatCHF(highOverall)}</strong></p>
           <p class="${highOverall !== null && lowOverall !== null && highOverall > lowOverall ? "positive" : ""}">
