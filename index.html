@@ -24,7 +24,6 @@
       --red-bg: #fae8e5;
       --yellow-bg: #fff4dd;
       --yellow-border: #f0c36d;
-      --grey-bg: #eeeeee;
     }
 
     * {
@@ -255,7 +254,7 @@
 
     .teacher-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
       gap: 14px;
       margin: 16px 0;
     }
@@ -289,56 +288,84 @@
     }
 
     .metric .big {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: bold;
       color: var(--accent);
     }
 
-    .table-scroll {
-      overflow-x: auto;
-      width: 100%;
+    .result-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
+    .result-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
       background: white;
-      font-size: 0.95rem;
+      padding: 16px;
     }
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-      vertical-align: middle;
+    .result-card h4 {
+      margin: 0 0 4px 0;
+      color: var(--accent);
+      font-size: 1.05rem;
     }
 
-    th {
-      background: var(--accent-light);
-      color: #2b1b12;
+    .result-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
     }
 
-    tr:nth-child(even) {
-      background: #fbf8f4;
+    .result-box {
+      border-radius: 12px;
+      padding: 12px;
+      border: 1px solid var(--border);
     }
 
-    .low-cell {
+    .result-box.low {
       background: var(--blue-bg);
     }
 
-    .high-cell {
+    .result-box.high {
       background: var(--green-bg);
     }
 
-    .positive {
-      color: var(--green);
+    .result-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-size: 1.15rem;
       font-weight: bold;
     }
 
-    .negative {
-      color: var(--red);
+    .diff-pill {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
       font-weight: bold;
+    }
+
+    .diff-pill.positive {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+
+    .diff-pill.negative {
+      background: var(--red-bg);
+      color: var(--red);
+    }
+
+    .diff-pill.neutral {
+      background: #eee;
+      color: #555;
     }
 
     .bar-wrap {
@@ -347,8 +374,8 @@
       overflow: hidden;
       height: 12px;
       width: 100%;
-      min-width: 90px;
-      margin-bottom: 4px;
+      margin-top: 5px;
+      margin-bottom: 8px;
     }
 
     .bar {
@@ -362,6 +389,39 @@
 
     .bar.highbar {
       background: var(--green);
+    }
+
+    .group-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .person-chip {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      background: white;
+    }
+
+    .person-chip.low {
+      background: var(--blue-bg);
+    }
+
+    .person-chip.high {
+      background: var(--green-bg);
+    }
+
+    .positive {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .negative {
+      color: var(--red);
+      font-weight: bold;
     }
 
     .small {
@@ -392,12 +452,12 @@
         font-size: 0.9rem;
       }
 
-      table {
-        font-size: 0.82rem;
+      .result-row {
+        grid-template-columns: 1fr;
       }
 
-      th, td {
-        padding: 7px;
+      .metric .big {
+        font-size: 1.55rem;
       }
     }
   </style>
@@ -640,6 +700,38 @@
 
     function formatCHF(value) {
       return "CHF " + Number(value).toFixed(2);
+    }
+
+    function formatDiff(value) {
+      if (value === null || isNaN(value)) {
+        return "-";
+      }
+
+      if (value > 0) {
+        return "+ CHF " + Number(value).toFixed(2);
+      }
+
+      if (value < 0) {
+        return "- CHF " + Math.abs(Number(value)).toFixed(2);
+      }
+
+      return "CHF 0.00";
+    }
+
+    function diffClass(value) {
+      if (value === null || isNaN(value)) {
+        return "neutral";
+      }
+
+      if (value > 0) {
+        return "positive";
+      }
+
+      if (value < 0) {
+        return "negative";
+      }
+
+      return "neutral";
     }
 
     function shuffleArray(array) {
@@ -1002,7 +1094,7 @@
           <div class="metric">
             <h3>Teilnehmende</h3>
             <div class="big">${participants.length}</div>
-            <p class="small">Low: ${lowParticipants} | High: ${highParticipants}</p>
+            <p class="small">Tief: ${lowParticipants} | Hoch: ${highParticipants}</p>
           </div>
 
           <div class="metric">
@@ -1012,21 +1104,21 @@
           </div>
 
           <div class="metric low">
-            <h3>Gruppe tiefer Vergleichspreis</h3>
+            <h3>Ø tief</h3>
             <div class="big">${lowOverall === null ? "-" : formatCHF(lowOverall)}</div>
             <p class="small">durchschnittliche Zahlungsbereitschaft</p>
           </div>
 
           <div class="metric high">
-            <h3>Gruppe hoher Vergleichspreis</h3>
+            <h3>Ø hoch</h3>
             <div class="big">${highOverall === null ? "-" : formatCHF(highOverall)}</div>
             <p class="small">durchschnittliche Zahlungsbereitschaft</p>
           </div>
 
           <div class="metric diff">
-            <h3>Unterschied</h3>
-            <div class="big ${overallDiff !== null && overallDiff > 0 ? "positive" : "negative"}">
-              ${overallDiff === null ? "-" : formatCHF(overallDiff)}
+            <h3>Effekt</h3>
+            <div class="big ${diffClass(overallDiff)}">
+              ${formatDiff(overallDiff)}
             </div>
             <p class="small">hoch minus tief</p>
           </div>
@@ -1036,22 +1128,8 @@
       let html = `
         <div class="card">
           <h3>Detailauswertung pro Angebot</h3>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Angebot</th>
-                  <th class="low-cell">Tiefer Vergleichspreis</th>
-                  <th class="low-cell">Ø Zahlungsbereitschaft</th>
-                  <th class="low-cell">n</th>
-                  <th class="high-cell">Hoher Vergleichspreis</th>
-                  <th class="high-cell">Ø Zahlungsbereitschaft</th>
-                  <th class="high-cell">n</th>
-                  <th>Unterschied</th>
-                  <th>Visualisierung</th>
-                </tr>
-              </thead>
-              <tbody>
+          <p class="muted">Keine breite Tabelle mehr: Die Werte sind als kompakte Karten dargestellt.</p>
+          <div class="result-card-grid">
       `;
 
       products.forEach(product => {
@@ -1074,63 +1152,56 @@
         const highWidth = highAvg === null ? 0 : Math.min(100, (highAvg / maxVal) * 100);
 
         html += `
-          <tr>
-            <td><strong>${product.targetName}</strong><br><span class="small">${product.info}</span></td>
-            <td class="low-cell">${formatCHF(product.lowPrice)}</td>
-            <td class="low-cell">${lowAvg === null ? "-" : formatCHF(lowAvg)}</td>
-            <td class="low-cell">${lows.length}</td>
-            <td class="high-cell">${formatCHF(product.highPrice)}</td>
-            <td class="high-cell">${highAvg === null ? "-" : formatCHF(highAvg)}</td>
-            <td class="high-cell">${highs.length}</td>
-            <td class="${diff !== null && diff > 0 ? "positive" : "negative"}">${diff === null ? "-" : formatCHF(diff)}</td>
-            <td>
-              <div class="small">Tief</div>
-              <div class="bar-wrap"><div class="bar lowbar" style="width:${lowWidth}%"></div></div>
-              <div class="small">Hoch</div>
-              <div class="bar-wrap"><div class="bar highbar" style="width:${highWidth}%"></div></div>
-            </td>
-          </tr>
+          <div class="result-card">
+            <h4>${product.targetName}</h4>
+            <div class="small">${product.info}</div>
+
+            <div class="result-row">
+              <div class="result-box low">
+                <div class="result-label">Tiefer Vergleichspreis</div>
+                <div class="result-value">${formatCHF(product.lowPrice)}</div>
+                <div class="result-label">Ø Zahlungsbereitschaft</div>
+                <div class="result-value">${lowAvg === null ? "-" : formatCHF(lowAvg)}</div>
+                <div class="small">n = ${lows.length}</div>
+                <div class="bar-wrap"><div class="bar lowbar" style="width:${lowWidth}%"></div></div>
+              </div>
+
+              <div class="result-box high">
+                <div class="result-label">Hoher Vergleichspreis</div>
+                <div class="result-value">${formatCHF(product.highPrice)}</div>
+                <div class="result-label">Ø Zahlungsbereitschaft</div>
+                <div class="result-value">${highAvg === null ? "-" : formatCHF(highAvg)}</div>
+                <div class="small">n = ${highs.length}</div>
+                <div class="bar-wrap"><div class="bar highbar" style="width:${highWidth}%"></div></div>
+              </div>
+            </div>
+
+            <div class="diff-pill ${diffClass(diff)}">
+              Effekt: ${formatDiff(diff)}
+            </div>
+          </div>
         `;
       });
 
       html += `
-              </tbody>
-            </table>
           </div>
         </div>
 
         <div class="card">
           <h3>Gruppenzuteilung</h3>
-          <p class="muted">
-            Zur Kontrolle: Jede neu startende Person wird abwechselnd zugeteilt.
-          </p>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Person</th>
-                  <th>Gruppe</th>
-                  <th>Zeitpunkt</th>
-                </tr>
-              </thead>
-              <tbody>
+          <p class="muted">Zur Kontrolle: Jede neu startende Person wird abwechselnd zugeteilt.</p>
+          <div class="group-list">
       `;
 
       participants.forEach(p => {
         html += `
-          <tr>
-            <td>${p.participant_number}</td>
-            <td class="${p.anchor_group === "low" ? "low-cell" : "high-cell"}">
-              ${p.anchor_group === "low" ? "tiefer Vergleichspreis" : "hoher Vergleichspreis"}
-            </td>
-            <td>${new Date(p.created_at).toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}</td>
-          </tr>
+          <div class="person-chip ${p.anchor_group}">
+            Person ${p.participant_number}: ${p.anchor_group === "low" ? "tief" : "hoch"}
+          </div>
         `;
       });
 
       html += `
-              </tbody>
-            </table>
           </div>
         </div>
 
