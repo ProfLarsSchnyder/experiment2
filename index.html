@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preisexperiment</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --card: #ffffff;
+      --text: #1f1f1f;
+      --muted: #666;
+      --accent: #7a3f22;
+      --accent2: #d9b99b;
+      --green: #2f7d4c;
+      --red: #b8432e;
+      --border: #e2d8ce;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--accent);
+      color: white;
+      padding: 18px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    main {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+
+    h3 {
+      margin-bottom: 8px;
+    }
+
+    p {
+      line-height: 1.45;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .warning {
+      background: #fff4dd;
+      border: 1px solid #f0c36d;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 14px 0;
+      font-weight: bold;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--accent);
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button.secondary {
+      background: #555;
+    }
+
+    button.danger {
+      background: var(--red);
+    }
+
+    input {
+      width: 100%;
+      max-width: 260px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #bbb;
+      font-size: 1.1rem;
+      margin-top: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .product-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: #fafafa;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      font-size: 1.9rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+
+    .step {
+      font-size: 0.9rem;
+      color: white;
+      background: var(--accent);
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .question-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .question-box img {
+      width: 100%;
+      max-height: 340px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: #fafafa;
+    }
+
+    .answer-panel {
+      background: #fbf8f4;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f0e5dc;
+    }
+
+    .positive {
+      color: var(--green);
+      font-weight: bold;
+    }
+
+    .negative {
+      color: var(--red);
+      font-weight: bold;
+    }
+
+    .teacher-link {
+      text-align: center;
+      margin-top: 30px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 760px) {
+      .question-box {
+        grid-template-columns: 1fr;
+      }
+
+      .product-card img {
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Preisexperiment</h1>
+  </header>
+
+  <main>
+
+    <section id="startView" class="card">
+      <h2>Wichtig vor dem Start</h2>
+
+      <div class="warning">
+        Dieses Preisexperiment funktioniert nur, wenn alle verdeckt, alleine und ohne zu sprechen arbeiten.
+      </div>
+
+      <p>Bitte beachten Sie:</p>
+
+      <ol>
+        <li>Bearbeiten Sie das Experiment komplett alleine.</li>
+        <li>Sprechen Sie während des Experiments nicht miteinander.</li>
+        <li>Zeigen Sie Ihre Ansicht niemandem neben Ihnen.</li>
+        <li>Schauen Sie nicht auf die Bildschirme anderer Personen.</li>
+        <li>Geben Sie Ihre Einschätzungen spontan und ehrlich ab.</li>
+        <li>Es gibt keine richtigen oder falschen Antworten.</li>
+      </ol>
+
+      <p class="muted">Starten Sie erst, wenn Sie bereit sind, das Experiment verdeckt und alleine durchzuführen.</p>
+
+      <button onclick="startExperiment()">Experiment starten</button>
+    </section>
+
+    <section id="anchorView" class="card hidden">
+      <span class="step">Teil 1</span>
+      <h2>Marktüberblick</h2>
+      <p>Schauen Sie sich die folgenden Vergleichsprodukte und Vergleichsangebote mit Preisen kurz an.</p>
+      <p class="muted">Sie müssen hier noch nichts eingeben.</p>
+
+      <div id="anchorGrid" class="grid"></div>
+
+      <button onclick="showEstimationView()">Weiter zur Preisschätzung</button>
+    </section>
+
+    <section id="estimateView" class="card hidden">
+      <span class="step">Teil 2</span>
+      <h2 id="estimateTitle">Preisschätzung</h2>
+
+      <p>Nun sehen Sie neue Produkte und Angebote ohne Preis.</p>
+      <p>Schätzen Sie jeweils, welcher Preis angemessen erscheint.</p>
+
+      <div class="question-box">
+        <div>
+          <img id="targetImage" src="" alt="Neues Produkt oder Angebot">
+        </div>
+
+        <div class="answer-panel">
+          <h3 id="targetName"></h3>
+          <p id="targetInfo" class="muted"></p>
+
+          <label for="priceInput"><strong>Welcher Preis erscheint angemessen?</strong></label>
+          <br>
+          <input id="priceInput" type="number" min="0" step="0.05" placeholder="CHF" />
+
+          <p class="muted">
+            Entscheiden Sie nach Ihrem persönlichen Preisgefühl. Das neue Produkt oder Angebot kann günstiger, gleich teuer oder teurer sein als die Vergleichsangebote von vorher.
+          </p>
+
+          <button onclick="saveEstimate()">Antwort speichern</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="doneView" class="card hidden">
+      <h2>Danke</h2>
+      <p>Ihre Antworten wurden gespeichert.</p>
+      <p>Bitte warten Sie ruhig, bis alle fertig sind.</p>
+    </section>
+
+    <section id="teacherLoginView" class="card hidden">
+      <h2>Lehrermodus</h2>
+      <p>Passwort eingeben:</p>
+      <input id="teacherPassword" type="password" placeholder="Passwort" />
+      <br>
+      <button onclick="openTeacherView()">Resultate anzeigen</button>
+    </section>
+
+    <section id="teacherView" class="card hidden">
+      <h2>Resultate</h2>
+      <p class="muted">
+        Vergleich zwischen Gruppe mit tiefen Ankerpreisen und Gruppe mit hohen Ankerpreisen.
+      </p>
+
+      <button onclick="loadResults()">Resultate aktualisieren</button>
+      <button class="danger" onclick="resetData()">Daten zurücksetzen</button>
+
+      <div id="resultsSummary"></div>
+      <div id="resultsTable"></div>
+    </section>
+
+    <div class="teacher-link" onclick="showTeacherLogin()">Lehrermodus</div>
+
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://xvgbisxwptnfupibcbpg.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_WF742ZbvUE8BzCTT2MZw2w_K2wFvYyt";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const SESSION_ID = "default";
+    const TEACHER_PASSWORD = "1234";
+
+    const products = [
+      {
+        id: 1,
+        anchorName: "Vergleichs-Eistee",
+        targetName: "Natura Premium Eistee",
+        info: "500 ml",
+        anchorImage: "img/anker/1a.png",
+        targetImage: "img/anker/1n.png",
+        lowPrice: 1.40,
+        highPrice: 2.60
+      },
+      {
+        id: 2,
+        anchorName: "Vergleichs-Chips",
+        targetName: "Golden Harvest Chips",
+        info: "150 g",
+        anchorImage: "img/anker/2a.png",
+        targetImage: "img/anker/2n.png",
+        lowPrice: 2.40,
+        highPrice: 3.80
+      },
+      {
+        id: 3,
+        anchorName: "Vergleichs-Duschgel",
+        targetName: "Pure Care Duschgel",
+        info: "250 ml",
+        anchorImage: "img/anker/3a.png",
+        targetImage: "img/anker/3n.png",
+        lowPrice: 2.50,
+        highPrice: 4.50
+      },
+      {
+        id: 4,
+        anchorName: "Vergleichs-Escape-Room",
+        targetName: "Escape Room, Operation Bankraub",
+        info: "60 Minuten, 1 Person",
+        anchorImage: "img/anker/4a.png",
+        targetImage: "img/anker/4n.png",
+        lowPrice: 29,
+        highPrice: 45
+      },
+      {
+        id: 5,
+        anchorName: "Vergleichs-Fitnessabo",
+        targetName: "FitLife Fitnessabo",
+        info: "1 Monat, Standardzugang",
+        anchorImage: "img/anker/5a.png",
+        targetImage: "img/anker/5n.png",
+        lowPrice: 39,
+        highPrice: 69
+      }
+    ];
+
+    let participant = null;
+    let currentIndex = 0;
+
+    function hideAllViews() {
+      document.getElementById("startView").classList.add("hidden");
+      document.getElementById("anchorView").classList.add("hidden");
+      document.getElementById("estimateView").classList.add("hidden");
+      document.getElementById("doneView").classList.add("hidden");
+      document.getElementById("teacherLoginView").classList.add("hidden");
+      document.getElementById("teacherView").classList.add("hidden");
+    }
+
+    function formatCHF(value) {
+      return "CHF " + Number(value).toFixed(2);
+    }
+
+    async function startExperiment() {
+      const existing = localStorage.getItem("anchor_experiment_participant");
+
+      if (existing) {
+        participant = JSON.parse(existing);
+      } else {
+        const { data, error } = await client.rpc("start_anchor_experiment", {
+          p_session_id: SESSION_ID
+        });
+
+        if (error) {
+          alert("Fehler beim Starten: " + error.message);
+          return;
+        }
+
+        participant = data[0];
+        localStorage.setItem("anchor_experiment_participant", JSON.stringify(participant));
+      }
+
+      renderAnchors();
+      hideAllViews();
+      document.getElementById("anchorView").classList.remove("hidden");
+    }
+
+    function getAnchorPrice(product) {
+      return participant.anchor_group === "low" ? product.lowPrice : product.highPrice;
+    }
+
+    function renderAnchors() {
+      const grid = document.getElementById("anchorGrid");
+      grid.innerHTML = "";
+
+      products.forEach(product => {
+        const price = getAnchorPrice(product);
+
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <img src="${product.anchorImage}" alt="${product.anchorName}">
+          <h3>${product.anchorName}</h3>
+          <p class="muted">${product.info}</p>
+          <div class="price">${formatCHF(price)}</div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    function showEstimationView() {
+      currentIndex = 0;
+      hideAllViews();
+      document.getElementById("estimateView").classList.remove("hidden");
+      renderCurrentEstimate();
+    }
+
+    function renderCurrentEstimate() {
+      const product = products[currentIndex];
+
+      document.getElementById("estimateTitle").textContent =
+        "Preisschätzung " + (currentIndex + 1) + " von " + products.length;
+
+      document.getElementById("targetImage").src = product.targetImage;
+      document.getElementById("targetName").textContent = product.targetName;
+      document.getElementById("targetInfo").textContent = product.info;
+      document.getElementById("priceInput").value = "";
+      document.getElementById("priceInput").focus();
+    }
+
+    async function saveEstimate() {
+      const input = document.getElementById("priceInput");
+      const value = Number(input.value);
+
+      if (!input.value || value < 0) {
+        alert("Bitte einen gültigen Preis eingeben.");
+        return;
+      }
+
+      const product = products[currentIndex];
+      const anchorPrice = getAnchorPrice(product);
+
+      const row = {
+        session_id: SESSION_ID,
+        participant_id: participant.participant_id,
+        participant_number: participant.participant_number,
+        anchor_group: participant.anchor_group,
+        product_id: product.id,
+        product_name: product.targetName,
+        anchor_price: anchorPrice,
+        estimated_price: value
+      };
+
+      const { error } = await client
+        .from("anchor_experiment_answers")
+        .upsert(row, { onConflict: "participant_id,product_id" });
+
+      if (error) {
+        alert("Fehler beim Speichern: " + error.message);
+        return;
+      }
+
+      currentIndex++;
+
+      if (currentIndex >= products.length) {
+        hideAllViews();
+        document.getElementById("doneView").classList.remove("hidden");
+      } else {
+        renderCurrentEstimate();
+      }
+    }
+
+    function showTeacherLogin() {
+      hideAllViews();
+      document.getElementById("teacherLoginView").classList.remove("hidden");
+    }
+
+    function openTeacherView() {
+      const password = document.getElementById("teacherPassword").value;
+
+      if (password !== TEACHER_PASSWORD) {
+        alert("Falsches Passwort.");
+        return;
+      }
+
+      hideAllViews();
+      document.getElementById("teacherView").classList.remove("hidden");
+      loadResults();
+    }
+
+    function average(values) {
+      if (!values.length) return null;
+      return values.reduce((sum, value) => sum + Number(value), 0) / values.length;
+    }
+
+    async function loadResults() {
+      const { data, error } = await client
+        .from("anchor_experiment_answers")
+        .select("*")
+        .eq("session_id", SESSION_ID)
+        .order("product_id", { ascending: true });
+
+      if (error) {
+        alert("Fehler beim Laden: " + error.message);
+        return;
+      }
+
+      renderResults(data || []);
+    }
+
+    function renderResults(rows) {
+      const tableDiv = document.getElementById("resultsTable");
+      const summaryDiv = document.getElementById("resultsSummary");
+
+      const lowRows = rows.filter(r => r.anchor_group === "low");
+      const highRows = rows.filter(r => r.anchor_group === "high");
+
+      const lowOverall = average(lowRows.map(r => r.estimated_price));
+      const highOverall = average(highRows.map(r => r.estimated_price));
+
+      summaryDiv.innerHTML = `
+        <div class="card">
+          <h3>Gesamteffekt</h3>
+          <p>Anzahl Antworten: <strong>${rows.length}</strong></p>
+          <p>Durchschnitt Gruppe tiefer Anker: <strong>${lowOverall === null ? "noch keine Daten" : formatCHF(lowOverall)}</strong></p>
+          <p>Durchschnitt Gruppe hoher Anker: <strong>${highOverall === null ? "noch keine Daten" : formatCHF(highOverall)}</strong></p>
+          <p class="${highOverall !== null && lowOverall !== null && highOverall > lowOverall ? "positive" : ""}">
+            Unterschied: ${highOverall !== null && lowOverall !== null ? formatCHF(highOverall - lowOverall) : "noch keine Daten"}
+          </p>
+        </div>
+      `;
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Fall</th>
+              <th>Anker tief</th>
+              <th>Ø Schätzung tief</th>
+              <th>n tief</th>
+              <th>Anker hoch</th>
+              <th>Ø Schätzung hoch</th>
+              <th>n hoch</th>
+              <th>Unterschied</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      products.forEach(product => {
+        const productRows = rows.filter(r => r.product_id === product.id);
+        const lows = productRows.filter(r => r.anchor_group === "low");
+        const highs = productRows.filter(r => r.anchor_group === "high");
+
+        const lowAvg = average(lows.map(r => r.estimated_price));
+        const highAvg = average(highs.map(r => r.estimated_price));
+
+        const diff = lowAvg !== null && highAvg !== null ? highAvg - lowAvg : null;
+
+        html += `
+          <tr>
+            <td>${product.targetName}</td>
+            <td>${formatCHF(product.lowPrice)}</td>
+            <td>${lowAvg === null ? "-" : formatCHF(lowAvg)}</td>
+            <td>${lows.length}</td>
+            <td>${formatCHF(product.highPrice)}</td>
+            <td>${highAvg === null ? "-" : formatCHF(highAvg)}</td>
+            <td>${highs.length}</td>
+            <td class="${diff !== null && diff > 0 ? "positive" : ""}">${diff === null ? "-" : formatCHF(diff)}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+          </tbody>
+        </table>
+
+        <div class="card">
+          <h3>Auswertungssatz</h3>
+          <p>
+            Beide Gruppen haben dieselben neuen Produkte und Angebote bewertet.
+            Der Unterschied war, dass eine Gruppe vorher tiefere Vergleichspreise und eine Gruppe vorher höhere Vergleichspreise gesehen hat.
+          </p>
+        </div>
+      `;
+
+      tableDiv.innerHTML = html;
+    }
+
+    async function resetData() {
+      const confirmReset = confirm("Wirklich alle Daten dieser Session löschen?");
+      if (!confirmReset) return;
+
+      const { error } = await client.rpc("reset_anchor_experiment", {
+        p_session_id: SESSION_ID
+      });
+
+      if (error) {
+        alert("Fehler beim Zurücksetzen: " + error.message);
+        return;
+      }
+
+      localStorage.removeItem("anchor_experiment_participant");
+      alert("Daten wurden zurückgesetzt.");
+      loadResults();
+    }
+  </script>
+</body>
+</html>
