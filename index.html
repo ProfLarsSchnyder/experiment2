@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Preisexperiment</title>
+  <title>Marktcheck</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -21,10 +21,14 @@
       --blue: #2463a6;
       --blue-bg: #e8f0fa;
       --red: #b8432e;
-      --yellow: #f4c542;
+      --red-bg: #fae8e5;
+      --yellow-bg: #fff4dd;
+      --yellow-border: #f0c36d;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -65,15 +69,21 @@
       color: var(--accent);
     }
 
+    h3 {
+      margin-bottom: 8px;
+    }
+
     p, li {
       line-height: 1.45;
     }
 
-    .muted { color: var(--muted); }
+    .muted {
+      color: var(--muted);
+    }
 
     .warning {
-      background: #fff4dd;
-      border: 1px solid #f0c36d;
+      background: var(--yellow-bg);
+      border: 1px solid var(--yellow-border);
       border-radius: 12px;
       padding: 14px;
       margin: 14px 0;
@@ -93,10 +103,17 @@
       margin-right: 8px;
     }
 
-    button:hover { opacity: 0.9; }
+    button:hover {
+      opacity: 0.9;
+    }
 
-    button.danger { background: var(--red); }
-    button.secondary { background: #555; }
+    button.danger {
+      background: var(--red);
+    }
+
+    button.secondary {
+      background: #555;
+    }
 
     input {
       width: 100%;
@@ -108,7 +125,9 @@
       margin-top: 8px;
     }
 
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
     .step {
       font-size: 0.9rem;
@@ -135,7 +154,7 @@
     }
 
     .price {
-      font-size: 2.3rem;
+      font-size: 2.4rem;
       font-weight: bold;
       color: var(--accent);
       margin: 14px 0;
@@ -164,6 +183,41 @@
       font-size: 0.9rem;
     }
 
+    .reaction-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .reaction-tile {
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 14px;
+      padding: 18px 12px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      color: var(--text);
+    }
+
+    .reaction-tile:hover {
+      background: #fbf8f4;
+    }
+
+    .reaction-tile.correct {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .reaction-tile.wrong {
+      background: var(--red-bg);
+      border-color: var(--red);
+      color: var(--red);
+    }
+
     .teacher-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -186,6 +240,11 @@
     .metric.high {
       background: var(--green-bg);
       border-color: #add8c0;
+    }
+
+    .metric.diff {
+      background: #fff8e8;
+      border-color: #e8c982;
     }
 
     .metric h3 {
@@ -249,16 +308,21 @@
       height: 12px;
       width: 100%;
       min-width: 90px;
+      margin-bottom: 4px;
     }
 
     .bar {
       height: 12px;
       border-radius: 999px;
-      background: var(--accent);
     }
 
-    .bar.lowbar { background: var(--blue); }
-    .bar.highbar { background: var(--green); }
+    .bar.lowbar {
+      background: var(--blue);
+    }
+
+    .bar.highbar {
+      background: var(--green);
+    }
 
     .small {
       font-size: 0.85rem;
@@ -266,7 +330,9 @@
     }
 
     @media (max-width: 760px) {
-      main { padding: 14px; }
+      main {
+        padding: 14px;
+      }
 
       .product-single img {
         max-height: 340px;
@@ -289,7 +355,7 @@
 
 <body>
   <header>
-    <h1>Preisexperiment</h1>
+    <h1>Marktcheck</h1>
   </header>
 
   <main>
@@ -297,28 +363,30 @@
       <h2>Wichtig vor dem Start</h2>
 
       <div class="warning">
-        Dieses Preisexperiment funktioniert nur, wenn alle verdeckt, alleine und ohne zu sprechen arbeiten.
+        Dieser Marktcheck funktioniert nur, wenn alle verdeckt, alleine und ohne zu sprechen arbeiten.
       </div>
 
       <ol>
-        <li>Bearbeiten Sie das Experiment komplett alleine.</li>
-        <li>Sprechen Sie während des Experiments nicht miteinander.</li>
+        <li>Bearbeiten Sie den Marktcheck komplett alleine.</li>
+        <li>Sprechen Sie währenddessen nicht miteinander.</li>
         <li>Zeigen Sie Ihre Ansicht niemandem neben Ihnen.</li>
         <li>Schauen Sie nicht auf die Bildschirme anderer Personen.</li>
         <li>Geben Sie Ihre Einschätzungen spontan und ehrlich ab.</li>
         <li>Es gibt keine richtigen oder falschen Antworten.</li>
       </ol>
 
-      <p class="muted">Starten Sie erst, wenn Sie bereit sind, das Experiment verdeckt und alleine durchzuführen.</p>
+      <p class="muted">
+        Heute geht es um spontane Einschätzungen im Marketing. Die genaue Auswertung schauen wir nachher gemeinsam an.
+      </p>
 
-      <button onclick="startExperiment()">Experiment starten</button>
+      <button onclick="startExperiment()">Marktcheck starten</button>
     </section>
 
     <section id="anchorIntroView" class="card hidden">
       <span class="step">Teil 1</span>
       <h2>Marktüberblick</h2>
 
-      <p>Sie sehen jetzt einige Vergleichsprodukte und Vergleichsangebote mit Preisen.</p>
+      <p>Sie sehen jetzt einige Produkte und Angebote.</p>
       <p>Schauen Sie sich jedes Angebot kurz an.</p>
       <p class="muted">Sie müssen hier noch nichts eingeben.</p>
 
@@ -327,25 +395,40 @@
 
     <section id="anchorItemView" class="card hidden">
       <span class="step">Teil 1</span>
+
       <div class="product-single">
         <div id="anchorProgress" class="progress"></div>
         <h2 id="anchorName"></h2>
         <p id="anchorInfo" class="muted"></p>
-        <img id="anchorImage" src="" alt="Vergleichsprodukt">
+        <img id="anchorImage" src="" alt="Produkt oder Angebot">
         <div id="anchorPrice" class="price"></div>
         <button onclick="nextAnchorItem()">Weiter</button>
       </div>
     </section>
 
+    <section id="reactionView" class="card hidden">
+      <span class="step">Zwischenaufgabe</span>
+      <h2>Kurze Konzentrationsaufgabe</h2>
+
+      <p>Klicken Sie so schnell wie möglich auf alle Felder mit dem Wort <strong>Marke</strong>.</p>
+      <p class="muted">Arbeiten Sie weiterhin alleine und ohne zu sprechen.</p>
+
+      <div id="reactionGrid" class="reaction-grid"></div>
+
+      <p id="reactionFeedback" class="muted"></p>
+
+      <button id="reactionContinueButton" class="hidden" onclick="showWillingnessIntro()">Weiter</button>
+    </section>
+
     <section id="willingnessIntroView" class="card hidden">
       <span class="step">Teil 2</span>
-      <h2>Zahlungsbereitschaft</h2>
+      <h2>Ihre Einschätzung</h2>
 
-      <p>Nun sehen Sie neue Produkte und Angebote ohne Preis.</p>
-      <p>Geben Sie jeweils an, wie viel Sie dafür maximal bezahlen würden.</p>
+      <p>Nun sehen Sie weitere Produkte und Angebote.</p>
+      <p>Geben Sie jeweils Ihre persönliche Einschätzung ab.</p>
 
       <div class="warning">
-        Entscheiden Sie nach Ihrem persönlichen Preisgefühl. Kopieren Sie nicht automatisch einen vorher gesehenen Preis.
+        Entscheiden Sie spontan und ehrlich. Es gibt keine richtige oder falsche Antwort.
       </div>
 
       <button onclick="showWillingnessItem()">Zur ersten Eingabe</button>
@@ -353,22 +436,23 @@
 
     <section id="willingnessItemView" class="card hidden">
       <span class="step">Teil 2</span>
+
       <div class="product-single">
         <div id="willingnessProgress" class="progress"></div>
         <h2 id="targetName"></h2>
         <p id="targetInfo" class="muted"></p>
-        <img id="targetImage" src="" alt="Neues Produkt oder Angebot">
+        <img id="targetImage" src="" alt="Produkt oder Angebot">
 
         <div class="answer-panel">
-          <label for="priceInput"><strong>Wie viel würden Sie maximal dafür bezahlen?</strong></label>
+          <label for="priceInput"><strong>Welcher Betrag passt aus Ihrer Sicht zu diesem Produkt oder Angebot?</strong></label>
           <br>
           <input id="priceInput" type="number" min="0" step="0.05" placeholder="CHF" />
 
           <p class="muted">
-            Das neue Produkt oder Angebot kann günstiger, gleich teuer oder teurer sein als die Vergleichsangebote von vorher.
+            Geben Sie den Betrag ein, der für Sie persönlich passend wirkt.
           </p>
 
-          <button onclick="saveWillingness()">Antwort speichern</button>
+          <button onclick="saveWillingness()">Einschätzung speichern</button>
         </div>
       </div>
     </section>
@@ -388,9 +472,9 @@
     </section>
 
     <section id="teacherView" class="card hidden">
-      <h2>Lehrermodus, Resultate</h2>
+      <h2>Lehrermodus, Zahlungsbereitschaft</h2>
       <p class="muted">
-        Vergleich zwischen Gruppe mit tiefen Ankerpreisen und Gruppe mit hohen Ankerpreisen.
+        Vergleich zwischen Gruppe mit tiefen Vergleichspreisen und Gruppe mit hohen Vergleichspreisen.
       </p>
 
       <button onclick="loadResults()">Resultate aktualisieren</button>
@@ -415,7 +499,7 @@
     const products = [
       {
         id: 1,
-        anchorName: "Vergleichs-Eistee",
+        anchorName: "Eistee",
         targetName: "Natura Premium Eistee",
         info: "500 ml",
         anchorImage: "1a.png",
@@ -425,7 +509,7 @@
       },
       {
         id: 2,
-        anchorName: "Vergleichs-Chips",
+        anchorName: "Chips",
         targetName: "Golden Harvest Chips",
         info: "150 g",
         anchorImage: "2a.png",
@@ -435,7 +519,7 @@
       },
       {
         id: 3,
-        anchorName: "Vergleichs-Duschgel",
+        anchorName: "Duschgel",
         targetName: "Pure Care Duschgel",
         info: "250 ml",
         anchorImage: "3a.png",
@@ -445,7 +529,7 @@
       },
       {
         id: 4,
-        anchorName: "Vergleichs-Escape-Room",
+        anchorName: "Escape Room",
         targetName: "Escape Room, Operation Bankraub",
         info: "60 Minuten, 1 Person",
         anchorImage: "4a.png",
@@ -455,7 +539,7 @@
       },
       {
         id: 5,
-        anchorName: "Vergleichs-Fitnessabo",
+        anchorName: "Fitnessabo",
         targetName: "FitLife Fitnessabo",
         info: "1 Monat, Standardzugang",
         anchorImage: "5a.png",
@@ -465,15 +549,33 @@
       }
     ];
 
+    const reactionWords = [
+      "Produkt",
+      "Marke",
+      "Design",
+      "Zielgruppe",
+      "Marke",
+      "Werbung",
+      "Verpackung",
+      "Kunde",
+      "Marke",
+      "Qualität",
+      "Angebot",
+      "Marke"
+    ];
+
     let participant = null;
     let anchorIndex = 0;
     let willingnessIndex = 0;
+    let foundMarkeCount = 0;
+    let reactionStartedAt = null;
 
     function hideAllViews() {
       [
         "startView",
         "anchorIntroView",
         "anchorItemView",
+        "reactionView",
         "willingnessIntroView",
         "willingnessItemView",
         "doneView",
@@ -528,7 +630,7 @@
       const price = getAnchorPrice(product);
 
       document.getElementById("anchorProgress").textContent =
-        "Vergleichsangebot " + (anchorIndex + 1) + " von " + products.length;
+        "Angebot " + (anchorIndex + 1) + " von " + products.length;
 
       document.getElementById("anchorName").textContent = product.anchorName;
       document.getElementById("anchorInfo").textContent = product.info;
@@ -540,11 +642,63 @@
       anchorIndex++;
 
       if (anchorIndex >= products.length) {
-        hideAllViews();
-        document.getElementById("willingnessIntroView").classList.remove("hidden");
+        showReactionGame();
       } else {
         renderAnchorItem();
       }
+    }
+
+    function showReactionGame() {
+      hideAllViews();
+      document.getElementById("reactionView").classList.remove("hidden");
+
+      foundMarkeCount = 0;
+      reactionStartedAt = Date.now();
+
+      const grid = document.getElementById("reactionGrid");
+      const feedback = document.getElementById("reactionFeedback");
+      const continueButton = document.getElementById("reactionContinueButton");
+
+      grid.innerHTML = "";
+      feedback.textContent = "";
+      continueButton.classList.add("hidden");
+
+      reactionWords.forEach((word) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "reaction-tile";
+        button.textContent = word;
+
+        button.addEventListener("click", () => {
+          if (button.classList.contains("correct") || button.classList.contains("wrong")) {
+            return;
+          }
+
+          if (word === "Marke") {
+            button.classList.add("correct");
+            foundMarkeCount++;
+
+            if (foundMarkeCount === 4) {
+              const seconds = ((Date.now() - reactionStartedAt) / 1000).toFixed(1);
+              feedback.textContent = "Geschafft in " + seconds + " Sekunden.";
+              continueButton.classList.remove("hidden");
+            }
+          } else {
+            button.classList.add("wrong");
+
+            setTimeout(() => {
+              button.classList.remove("wrong");
+            }, 350);
+          }
+        });
+
+        grid.appendChild(button);
+      });
+    }
+
+    function showWillingnessIntro() {
+      hideAllViews();
+      document.getElementById("willingnessIntroView").classList.remove("hidden");
     }
 
     function showWillingnessItem() {
@@ -558,7 +712,7 @@
       const product = products[willingnessIndex];
 
       document.getElementById("willingnessProgress").textContent =
-        "Zahlungsbereitschaft " + (willingnessIndex + 1) + " von " + products.length;
+        "Einschätzung " + (willingnessIndex + 1) + " von " + products.length;
 
       document.getElementById("targetName").textContent = product.targetName;
       document.getElementById("targetInfo").textContent = product.info;
@@ -636,21 +790,37 @@
     }
 
     async function loadResults() {
-      const { data, error } = await client
+      const answersQuery = client
         .from("anchor_experiment_answers")
         .select("*")
         .eq("session_id", SESSION_ID)
         .order("product_id", { ascending: true });
 
-      if (error) {
-        alert("Fehler beim Laden: " + error.message);
+      const participantsQuery = client
+        .from("anchor_experiment_participants")
+        .select("*")
+        .eq("session_id", SESSION_ID)
+        .order("participant_number", { ascending: true });
+
+      const [answersResult, participantsResult] = await Promise.all([
+        answersQuery,
+        participantsQuery
+      ]);
+
+      if (answersResult.error) {
+        alert("Fehler beim Laden der Antworten: " + answersResult.error.message);
         return;
       }
 
-      renderResults(data || []);
+      if (participantsResult.error) {
+        alert("Fehler beim Laden der Teilnehmenden: " + participantsResult.error.message);
+        return;
+      }
+
+      renderResults(answersResult.data || [], participantsResult.data || []);
     }
 
-    function renderResults(rows) {
+    function renderResults(rows, participants) {
       const tableDiv = document.getElementById("resultsTable");
       const summaryDiv = document.getElementById("resultsSummary");
 
@@ -661,11 +831,17 @@
       const highOverall = average(highRows.map(r => r.estimated_price));
       const overallDiff = lowOverall !== null && highOverall !== null ? highOverall - lowOverall : null;
 
-      const lowParticipants = new Set(lowRows.map(r => r.participant_id)).size;
-      const highParticipants = new Set(highRows.map(r => r.participant_id)).size;
+      const lowParticipants = participants.filter(p => p.anchor_group === "low").length;
+      const highParticipants = participants.filter(p => p.anchor_group === "high").length;
 
       summaryDiv.innerHTML = `
         <div class="teacher-grid">
+          <div class="metric">
+            <h3>Teilnehmende</h3>
+            <div class="big">${participants.length}</div>
+            <p class="small">Low: ${lowParticipants} | High: ${highParticipants}</p>
+          </div>
+
           <div class="metric">
             <h3>Gespeicherte Antworten</h3>
             <div class="big">${rows.length}</div>
@@ -673,18 +849,18 @@
           </div>
 
           <div class="metric low">
-            <h3>Gruppe tiefer Anker</h3>
+            <h3>Gruppe tiefer Vergleichspreis</h3>
             <div class="big">${lowOverall === null ? "-" : formatCHF(lowOverall)}</div>
-            <p class="small">${lowParticipants} Teilnehmende</p>
+            <p class="small">durchschnittliche Zahlungsbereitschaft</p>
           </div>
 
           <div class="metric high">
-            <h3>Gruppe hoher Anker</h3>
+            <h3>Gruppe hoher Vergleichspreis</h3>
             <div class="big">${highOverall === null ? "-" : formatCHF(highOverall)}</div>
-            <p class="small">${highParticipants} Teilnehmende</p>
+            <p class="small">durchschnittliche Zahlungsbereitschaft</p>
           </div>
 
-          <div class="metric">
+          <div class="metric diff">
             <h3>Unterschied</h3>
             <div class="big ${overallDiff !== null && overallDiff > 0 ? "positive" : "negative"}">
               ${overallDiff === null ? "-" : formatCHF(overallDiff)}
@@ -696,16 +872,16 @@
 
       let html = `
         <div class="card">
-          <h3>Detailauswertung pro Fall</h3>
+          <h3>Detailauswertung pro Angebot</h3>
           <table>
             <thead>
               <tr>
-                <th>Fall</th>
-                <th class="low-cell">Anker tief</th>
-                <th class="low-cell">Ø Zahlungsbereitschaft tief</th>
+                <th>Angebot</th>
+                <th class="low-cell">Tiefer Vergleichspreis</th>
+                <th class="low-cell">Ø Zahlungsbereitschaft</th>
                 <th class="low-cell">n</th>
-                <th class="high-cell">Anker hoch</th>
-                <th class="high-cell">Ø Zahlungsbereitschaft hoch</th>
+                <th class="high-cell">Hoher Vergleichspreis</th>
+                <th class="high-cell">Ø Zahlungsbereitschaft</th>
                 <th class="high-cell">n</th>
                 <th>Unterschied</th>
                 <th>Visualisierung</th>
@@ -759,14 +935,47 @@
         </div>
 
         <div class="card">
+          <h3>Gruppenzuteilung</h3>
+          <p class="muted">
+            Zur Kontrolle: Jede neu startende Person wird abwechselnd zugeteilt.
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>Person</th>
+                <th>Gruppe</th>
+                <th>Zeitpunkt</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      participants.forEach(p => {
+        html += `
+          <tr>
+            <td>${p.participant_number}</td>
+            <td class="${p.anchor_group === "low" ? "low-cell" : "high-cell"}">
+              ${p.anchor_group === "low" ? "tiefer Vergleichspreis" : "hoher Vergleichspreis"}
+            </td>
+            <td>${new Date(p.created_at).toLocaleTimeString("de-CH", { hour: "2-digit", minute: "2-digit" })}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
           <h3>Auswertungssatz</h3>
           <p>
             Beide Gruppen haben dieselben neuen Produkte und Angebote bewertet.
-            Der Unterschied war, dass eine Gruppe vorher tiefere Vergleichspreise und eine Gruppe vorher höhere Vergleichspreise gesehen hat.
+            Der Unterschied war, dass eine Gruppe vorher tiefere Preise und eine Gruppe vorher höhere Preise gesehen hat.
           </p>
           <p>
-            Wenn die Zahlungsbereitschaft in der Gruppe mit hohen Ankern höher liegt, sieht man den Ankereffekt:
-            Ein vorher gesehener Preis beeinflusst, was danach als angemessen empfunden wird.
+            Wenn die Zahlungsbereitschaft in der Gruppe mit hohen Preisen höher liegt, sieht man den Ankereffekt:
+            Ein vorher gesehener Wert beeinflusst, was danach als angemessen empfunden wird.
           </p>
         </div>
       `;
