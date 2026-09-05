@@ -281,6 +281,11 @@
       border-color: #e8c982;
     }
 
+    .metric.percent {
+      background: #f4ecff;
+      border-color: #d6bdf5;
+    }
+
     .metric h3 {
       margin: 0 0 8px 0;
       font-size: 1rem;
@@ -368,6 +373,17 @@
       color: #555;
     }
 
+    .percent-pill {
+      display: inline-block;
+      margin-top: 8px;
+      margin-left: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #f4ecff;
+      color: #6d3fa0;
+    }
+
     .bar-wrap {
       background: #eee;
       border-radius: 999px;
@@ -421,6 +437,11 @@
 
     .negative {
       color: var(--red);
+      font-weight: bold;
+    }
+
+    .neutral {
+      color: #555;
       font-weight: bold;
     }
 
@@ -716,6 +737,30 @@
       }
 
       return "CHF 0.00";
+    }
+
+    function formatPercent(value) {
+      if (value === null || isNaN(value)) {
+        return "-";
+      }
+
+      if (value > 0) {
+        return "+ " + Number(value).toFixed(1) + " %";
+      }
+
+      if (value < 0) {
+        return "- " + Math.abs(Number(value)).toFixed(1) + " %";
+      }
+
+      return "0.0 %";
+    }
+
+    function percentDiffValue(highValue, lowValue) {
+      if (highValue === null || lowValue === null || isNaN(highValue) || isNaN(lowValue) || lowValue === 0) {
+        return null;
+      }
+
+      return ((highValue - lowValue) / lowValue) * 100;
     }
 
     function diffClass(value) {
@@ -1085,6 +1130,7 @@
       const lowOverall = average(lowRows.map(r => r.estimated_price));
       const highOverall = average(highRows.map(r => r.estimated_price));
       const overallDiff = lowOverall !== null && highOverall !== null ? highOverall - lowOverall : null;
+      const overallPercentDiff = percentDiffValue(highOverall, lowOverall);
 
       const lowParticipants = participants.filter(p => p.anchor_group === "low").length;
       const highParticipants = participants.filter(p => p.anchor_group === "high").length;
@@ -1116,11 +1162,19 @@
           </div>
 
           <div class="metric diff">
-            <h3>Effekt</h3>
+            <h3>Effekt absolut</h3>
             <div class="big ${diffClass(overallDiff)}">
               ${formatDiff(overallDiff)}
             </div>
             <p class="small">hoch minus tief</p>
+          </div>
+
+          <div class="metric percent">
+            <h3>Effekt prozentual</h3>
+            <div class="big ${diffClass(overallPercentDiff)}">
+              ${formatPercent(overallPercentDiff)}
+            </div>
+            <p class="small">(hoch - tief) / tief</p>
           </div>
         </div>
       `;
@@ -1128,7 +1182,7 @@
       let html = `
         <div class="card">
           <h3>Detailauswertung pro Angebot</h3>
-          <p class="muted">Keine breite Tabelle mehr: Die Werte sind als kompakte Karten dargestellt.</p>
+          <p class="muted">Pro Angebot sehen Sie den absoluten und prozentualen Unterschied zwischen den beiden Gruppen.</p>
           <div class="result-card-grid">
       `;
 
@@ -1140,6 +1194,7 @@
         const lowAvg = average(lows.map(r => r.estimated_price));
         const highAvg = average(highs.map(r => r.estimated_price));
         const diff = lowAvg !== null && highAvg !== null ? highAvg - lowAvg : null;
+        const percentDiff = percentDiffValue(highAvg, lowAvg);
 
         const maxVal = Math.max(
           product.highPrice,
@@ -1176,8 +1231,13 @@
               </div>
             </div>
 
-            <div class="diff-pill ${diffClass(diff)}">
-              Effekt: ${formatDiff(diff)}
+            <div>
+              <span class="diff-pill ${diffClass(diff)}">
+                Absolut: ${formatDiff(diff)}
+              </span>
+              <span class="percent-pill">
+                Prozentual: ${formatPercent(percentDiff)}
+              </span>
             </div>
           </div>
         `;
@@ -1203,6 +1263,25 @@
 
       html += `
           </div>
+        </div>
+
+        <div class="card">
+          <h3>Gesamtzusammenfassung</h3>
+          <p>
+            Im Durchschnitt lag die Zahlungsbereitschaft der Gruppe mit hohen Vergleichspreisen bei
+            <strong>${highOverall === null ? "-" : formatCHF(highOverall)}</strong>.
+            Die Zahlungsbereitschaft der Gruppe mit tiefen Vergleichspreisen lag bei
+            <strong>${lowOverall === null ? "-" : formatCHF(lowOverall)}</strong>.
+          </p>
+          <p>
+            Der absolute Unterschied beträgt
+            <strong class="${diffClass(overallDiff)}">${formatDiff(overallDiff)}</strong>.
+            Der prozentuale Unterschied beträgt
+            <strong class="${diffClass(overallPercentDiff)}">${formatPercent(overallPercentDiff)}</strong>.
+          </p>
+          <p class="muted">
+            Formel: prozentualer Unterschied = (Ø hoch - Ø tief) / Ø tief × 100.
+          </p>
         </div>
 
         <div class="card">
