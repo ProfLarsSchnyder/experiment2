@@ -120,6 +120,25 @@
       margin-top: 8px;
     }
 
+    .input-with-suffix {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .input-with-suffix input {
+      margin-top: 0;
+    }
+
+    .input-suffix {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+
     .hidden { display: none; }
 
     .step {
@@ -594,7 +613,10 @@
       <div class="answer-panel">
         <label for="extraInput"><strong id="extraInputLabel"></strong></label>
         <br>
-        <input id="extraInput" type="number" min="0" step="1" placeholder="" />
+        <div class="input-with-suffix">
+          <input id="extraInput" type="number" min="0" step="1" placeholder="" />
+          <span id="extraInputSuffix" class="input-suffix"></span>
+        </div>
         <p class="muted">Geben Sie eine möglichst passende Schätzung ein.</p>
         <button onclick="saveExtraEstimate()">Einschätzung speichern</button>
       </div>
@@ -644,7 +666,7 @@
     const products = [
       {
         id: 1,
-        anchorName: "Eistee",
+        anchorName: "Fresh Cola",
         targetName: "Natura Premium Eistee",
         info: "500 ml",
         anchorImage: "1a.png",
@@ -654,7 +676,7 @@
       },
       {
         id: 2,
-        anchorName: "Chips",
+        anchorName: "Classic Salzchips",
         targetName: "Golden Harvest Chips",
         info: "150 g",
         anchorImage: "2a.png",
@@ -664,7 +686,7 @@
       },
       {
         id: 3,
-        anchorName: "Duschgel",
+        anchorName: "Pure Drop Flüssigseife",
         targetName: "Pure Care Duschgel",
         info: "250 ml",
         anchorImage: "3a.png",
@@ -674,7 +696,7 @@
       },
       {
         id: 4,
-        anchorName: "Escape Room",
+        anchorName: "PulseZone Lasertag",
         targetName: "Escape Room, Operation Bankraub",
         info: "60 Minuten, 1 Person",
         anchorImage: "4a.png",
@@ -684,7 +706,7 @@
       },
       {
         id: 5,
-        anchorName: "Fitnessabo",
+        anchorName: "Aqua Life Hallenbad-Abo",
         targetName: "FitLife Fitnessabo",
         info: "1 Monat, Standardzugang",
         anchorImage: "5a.png",
@@ -1200,9 +1222,20 @@
 
       document.getElementById("extraEstimateTitle").textContent = question.estimateTitle;
       document.getElementById("extraEstimateQuestion").textContent = question.estimateText;
+      const extraInput = document.getElementById("extraInput");
+      const extraSuffix = document.getElementById("extraInputSuffix");
+
       document.getElementById("extraInputLabel").textContent = "Ihre Schätzung:";
-      document.getElementById("extraInput").placeholder = question.placeholder;
-      document.getElementById("extraInput").value = "";
+      extraInput.placeholder = question.placeholder;
+      extraInput.value = "";
+
+      if (question.id === 2) {
+        extraInput.max = "999";
+        extraSuffix.textContent = "Mio.";
+      } else {
+        extraInput.removeAttribute("max");
+        extraSuffix.textContent = "";
+      }
 
       setTimeout(() => {
         document.getElementById("extraInput").focus();
@@ -1219,6 +1252,11 @@
       }
 
       const question = extraOrder[extraIndex];
+
+      if (question.id === 2 && value > 999) {
+        alert("Bitte bei Tokio maximal 999 eingeben.");
+        return;
+      }
       const anchor = getExtraAnchor(question);
 
       const row = {
